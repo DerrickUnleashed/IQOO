@@ -7,8 +7,9 @@ import 'package:accesscopilot/shared/widgets/index.dart';
 
 void main() {
   group('Design system components', () {
-    testWidgets('PrimaryButton renders and responds to taps',
-        (WidgetTester tester) async {
+    testWidgets('PrimaryButton renders and responds to taps', (
+      WidgetTester tester,
+    ) async {
       var tapped = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -26,8 +27,9 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('AccessibilityBadge shows icon and label',
-        (WidgetTester tester) async {
+    testWidgets('AccessibilityBadge shows icon and label', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -43,8 +45,9 @@ void main() {
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
     });
 
-    testWidgets('InstructionCard shows action and detail',
-        (WidgetTester tester) async {
+    testWidgets('InstructionCard shows action and detail', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -61,13 +64,12 @@ void main() {
       expect(find.text('NEXT ACTION'), findsOneWidget);
     });
 
-    testWidgets('ConfidenceIndicator shows percentage semantics',
-        (WidgetTester tester) async {
+    testWidgets('ConfidenceIndicator shows percentage semantics', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ConfidenceIndicator(confidence: 0.91),
-          ),
+          home: Scaffold(body: ConfidenceIndicator(confidence: 0.91)),
         ),
       );
 
@@ -75,14 +77,11 @@ void main() {
       expect(find.text('High'), findsOneWidget);
     });
 
-    testWidgets('VoiceButton has an accessible label',
-        (WidgetTester tester) async {
+    testWidgets('VoiceButton has an accessible label', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: VoiceButton(onPressed: null),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: VoiceButton(onPressed: null))),
       );
 
       final semantics = tester.getSemantics(find.byType(VoiceButton));

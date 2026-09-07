@@ -10,22 +10,18 @@ import 'package:accesscopilot/features/onboarding/domain/onboarding_providers.da
 import 'package:accesscopilot/features/onboarding/presentation/onboarding_pager.dart';
 
 Widget _wrap(Widget child) {
-  return ProviderScope(
-    child: MaterialApp(home: child),
-  );
+  return ProviderScope(child: MaterialApp(home: child));
 }
 
 void main() {
   group('OnboardingPager', () {
-    testWidgets('shows the three product pages in order',
-        (WidgetTester tester) async {
+    testWidgets('shows the three product pages in order', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_wrap(OnboardingPager(onFinished: () {})));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Your AI accessibility copilot.'),
-        findsOneWidget,
-      );
+      expect(find.text('Your AI accessibility copilot.'), findsOneWidget);
       expect(find.text('Continue'), findsOneWidget);
 
       await tester.tap(find.text('Continue'));
@@ -38,8 +34,9 @@ void main() {
       expect(find.text('Get started'), findsOneWidget);
     });
 
-    testWidgets('finishes when the last page is reached',
-        (WidgetTester tester) async {
+    testWidgets('finishes when the last page is reached', (
+      WidgetTester tester,
+    ) async {
       var finished = false;
       await tester.pumpWidget(
         _wrap(OnboardingPager(onFinished: () => finished = true)),
@@ -56,8 +53,9 @@ void main() {
       expect(finished, isTrue);
     });
 
-    testWidgets('skip button finishes immediately',
-        (WidgetTester tester) async {
+    testWidgets('skip button finishes immediately', (
+      WidgetTester tester,
+    ) async {
       var finished = false;
       await tester.pumpWidget(
         _wrap(OnboardingPager(onFinished: () => finished = true)),
@@ -79,15 +77,19 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(accessibilityProfileProvider.notifier);
-      expect(container.read(accessibilityProfileProvider).mobility,
-          MobilityAssistance.none);
+      expect(
+        container.read(accessibilityProfileProvider).mobility,
+        MobilityAssistance.none,
+      );
 
       notifier.update(
         const AccessibilityProfile(mobility: MobilityAssistance.wheelchair),
       );
 
-      expect(container.read(accessibilityProfileProvider).mobility,
-          MobilityAssistance.wheelchair);
+      expect(
+        container.read(accessibilityProfileProvider).mobility,
+        MobilityAssistance.wheelchair,
+      );
     });
 
     test('onboarding completed flag toggles', () async {

@@ -27,8 +27,7 @@ void main() {
         cognitiveLoadPreference: 1,
       );
 
-      final restored =
-          AccessibilityProfile.fromJson(profile.toJson());
+      final restored = AccessibilityProfile.fromJson(profile.toJson());
 
       expect(restored.mobility, MobilityAssistance.wheelchair);
       expect(restored.vision, VisionAssistance.lowVision);
@@ -55,7 +54,9 @@ void main() {
       expect(wheelchair.usesWheelchair, isTrue);
       expect(wheelchair.needsSpatialAudio, isFalse);
 
-      const lowVision = AccessibilityProfile(vision: VisionAssistance.lowVision);
+      const lowVision = AccessibilityProfile(
+        vision: VisionAssistance.lowVision,
+      );
       expect(lowVision.needsSpatialAudio, isTrue);
 
       const deaf = AccessibilityProfile(hearing: HearingAssistance.deaf);
@@ -64,10 +65,7 @@ void main() {
 
     test('storage keys round-trip', () {
       for (final v in MobilityAssistance.values) {
-        expect(
-          MobilityAssistance.fromStorageKey(v.storageKey),
-          v,
-        );
+        expect(MobilityAssistance.fromStorageKey(v.storageKey), v);
       }
       for (final v in GuidanceStyle.values) {
         expect(GuidanceStyle.fromStorageKey(v.storageKey), v);
