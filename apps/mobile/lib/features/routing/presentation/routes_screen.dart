@@ -38,15 +38,22 @@ class RoutesScreen extends ConsumerWidget {
             RouteCalculating() => const Center(
                 child: CircularProgressIndicator(),
               ),
-            RouteActive(:final route, :final stepIndex, :final destinationLabel) =>
+            RouteActive(:final route, :final stepIndex, :final destinationLabel, :final lastVerification) =>
               _StepNavigator(
                 route: route,
                 stepIndex: stepIndex,
                 destination: destinationLabel ?? selection.name,
+                lastVerification: lastVerification,
                 onPrevious: () =>
                     ref.read(routeControllerProvider.notifier).previousStep(),
                 onNext: () =>
                     ref.read(routeControllerProvider.notifier).nextStep(),
+                onVerify: () =>
+                    ref.read(routeControllerProvider.notifier).verifyCurrentStep(),
+                onReplan: () =>
+                    ref.read(routeControllerProvider.notifier).replan(
+                      reason: lastVerification?.message,
+                    ),
                 onDone: () {
                   ref.read(routeControllerProvider.notifier).reset();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -212,16 +219,22 @@ class _StepNavigator extends ConsumerWidget {
     required this.route,
     required this.stepIndex,
     required this.destination,
+    required this.lastVerification,
     required this.onPrevious,
     required this.onNext,
+    required this.onVerify,
+    required this.onReplan,
     required this.onDone,
   });
 
   final api.Route route;
   final int stepIndex;
   final String destination;
+  final api.VerificationResult? lastVerification;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
+  final VoidCallback onVerify;
+  final VoidCallback onReplan;
   final VoidCallback onDone;
 
   @override
@@ -292,6 +305,21 @@ class _StepNavigator extends ConsumerWidget {
           ),
         ],
         const SizedBox(height: AppSpacing.xxl),
+        if (lastVerification != null)
+          _CheckpointBanner(
+            result: lastVerification!,
+            onReplan: onReplan,
+          ),
+        const SizedBox(height: AppSpacing.md),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            onPressed: onVerify,
+            icon: const Icon(Icons.radar_rounded),
+            label: const Text('Checkpoint — am I here?'),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
         Row(
           children: [
             Expanded(
@@ -416,6 +444,59 @@ class _PlannerError extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           OutlinedButton(onPressed: onRetry, child: const Text('Back')),
         ],
+      ),
+    );
+  }
+}
+/// Result banner for the closed-loop checkpoint, with a replan action
+/// when the current path is blocked.
+class _CheckpointBanner extends StatelessWidget {
+  const _CheckpointBanner({required this.result, required this.onReplan});
+
+  final api.VerificationResult result;
+  final VoidCallback onReplan;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final verified = result.verified == true;
+    final color = verified ? scheme.primary : scheme.errorContainer;
+    final onColor = verified ? scheme.onPrimary : scheme.onErrorContainer;
+
+    return Semantics(
+      liveRegion: true,
+      label: result.message ?? (verified ? 'Step verified' : 'Step blocked'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              verified ? Icons.check_circle_rounded : Icons.warning_amber_rounded,
+              color: onColor,
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                result.message ??
+                    (verified ? 'Step verified.' : 'Step could not be verified.'),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: onColor,
+                    ),
+              ),
+            ),
+            if (!verified)
+              TextButton(
+                onPressed: onReplan,
+                style: TextButton.styleFrom(foregroundColor: onColor),
+                child: const Text('Replan'),
+              ),
+          ],
+        ),
       ),
     );
   }

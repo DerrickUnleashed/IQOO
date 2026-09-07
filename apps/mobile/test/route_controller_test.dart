@@ -122,4 +122,71 @@ void main() {
     controller.reset();
     expect(container.read(routeControllerProvider), isA<RouteIdle>());
   });
+
+  test('verifyCurrentStep records the closed-loop result', () async {
+    final container = makeContainer(
+      MockClient((request) async {
+        if (request.url.path.endsWith('/verification/check')) {
+          return http.Response(
+            jsonEncode({
+              'action_id': 'step-1',
+              'verified': true,
+              'confidence': 0.7,
+              'message': 'The expected scene element was confirmed.',
+              'replan_required': false,
+            }),
+            200,
+          );
+        }
+        return http.Response(jsonEncode(_routeJson), 200);
+      }),
+    );
+
+    final controller = container.read(routeControllerProvider.notifier);
+    await controller.startRoute(
+      origin: api.Location(latitude: 0, longitude: 0),
+      destination: api.Location(latitude: 0, longitude: 0, floorLevel: 1),
+    );
+    final result = await controller.verifyCurrentStep();
+
+    final state = container.read(routeControllerProvider) as RouteActive;
+    expect(result?.verified, isTrue);
+    expect(state.lastVerification?.verified, isTrue);
+    expect(state.lastVerification?.actionId, 'step-1');
+  });
+
+  test('replan replaces the active route', () async {
+    final replanJson = {
+      'route_id': 'r-2',
+      'distance_m': 60.0,
+      'duration_estimate_s': 200,
+      'accessibility_score': 0.95,
+      'steps': [
+        {'instruction': 'Detour via the side entrance', 'action_type': 'walk'},
+        {'instruction': 'Ramp to the lobby', 'action_type': 'ramp'},
+      ],
+    };
+    final container = makeContainer(
+      MockClient((request) async {
+        if (request.url.path.endsWith('/routes/replan')) {
+          return http.Response(jsonEncode(replanJson), 200);
+        }
+        return http.Response(jsonEncode(_routeJson), 200);
+      }),
+    );
+
+    final controller = container.read(routeControllerProvider.notifier);
+    await controller.startRoute(
+      origin: api.Location(latitude: 0, longitude: 0),
+      destination: api.Location(latitude: 0, longitude: 0, floorLevel: 1),
+    );
+    await controller.replan(reason: 'blocked');
+
+    final state = container.read(routeControllerProvider);
+    expect(state, isA<RouteActive>());
+    final active = state as RouteActive;
+    expect(active.route.routeId, 'r-2');
+    expect(active.stepIndex, 0);
+    expect(active.route.steps?.first.instruction, 'Detour via the side entrance');
+  });
 }

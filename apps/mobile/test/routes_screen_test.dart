@@ -52,6 +52,18 @@ MockClient _mock() => MockClient((request) async {
       if (path.endsWith('/auth/session')) {
         return http.Response(jsonEncode({'session_id': 's-1'}), 200);
       }
+      if (path.endsWith('/verification/check')) {
+        return http.Response(
+          jsonEncode({
+            'action_id': 'step-1',
+            'verified': false,
+            'confidence': 0.9,
+            'message': 'A temporary blockage is currently visible.',
+            'replan_required': true,
+          }),
+          200,
+        );
+      }
       if (path.endsWith('/routes/calculate')) {
         return http.Response(jsonEncode(_routeJson), 200);
       }
@@ -128,5 +140,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('Step 2 of 2'), findsOneWidget);
     expect(find.text('Finish'), findsOneWidget);
+  });
+
+  testWidgets('a blocked checkpoint offers a replan action', (tester) async {
+    final (container, _) = _start();
+    addTearDown(container.dispose);
+    container.read(buildingSelectionProvider.notifier).select(_building);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: RoutesScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Floor 2'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('Checkpoint'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Replan'), findsOneWidget);
+    expect(
+      find.text('A temporary blockage is currently visible.'),
+      findsOneWidget,
+    );
   });
 }
