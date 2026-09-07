@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:accesscopilot/core/domain/models/accessibility_profile.dart';
+import 'package:accesscopilot/core/domain/models/app_session.dart';
 import 'package:accesscopilot/features/onboarding/data/local_storage.dart';
 import 'package:accesscopilot/features/onboarding/domain/onboarding_providers.dart';
 import 'package:accesscopilot/features/onboarding/presentation/onboarding_pager.dart';
@@ -107,6 +108,7 @@ void main() {
 class _MemoryStorage implements LocalStorage {
   bool _completed = false;
   AccessibilityProfile? _profile;
+  AppSession? _session;
 
   @override
   Future<void> setOnboardingCompleted(bool completed) async {
@@ -123,4 +125,12 @@ class _MemoryStorage implements LocalStorage {
 
   @override
   Future<AccessibilityProfile?> loadProfile() async => _profile;
+
+  @override
+  Future<void> saveSession(AppSession session) async {
+    _session = session;
+  }
+
+  @override
+  Future<AppSession?> loadSession() async => _session;
 }
