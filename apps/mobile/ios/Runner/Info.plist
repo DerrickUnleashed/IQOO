@@ -7,7 +7,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Accesscopilot</string>
+	<string>AccessCopilot</string>
+	<key>NSCameraUsageDescription</key>
+	<string>AccessCopilot uses your camera to understand the environment and guide you along safe, accessible routes.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

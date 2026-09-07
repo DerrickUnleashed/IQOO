@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Camera access is required for environment perception. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Torch / flash control on supported devices. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
     <application
-        android:label="accesscopilot"
+        android:label="AccessCopilot"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
