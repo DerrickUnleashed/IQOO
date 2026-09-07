@@ -7,6 +7,7 @@ import '../../../core/api/api_client.g.dart' as api;
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/index.dart';
 import '../../buildings/domain/buildings_providers.dart';
+import '../../guidance/domain/guidance_engine.dart';
 import '../../onboarding/domain/onboarding_providers.dart';
 import '../domain/route_controller.dart';
 import '../domain/route_cues.dart';
@@ -20,6 +21,20 @@ class RoutesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(routeControllerProvider);
     final selection = ref.watch(buildingSelectionProvider);
+
+    // Announce new instructions as the user advances the route.
+    ref.listen(routeControllerProvider, (previous, next) {
+      final guidance = ref.read(guidanceEngineProvider);
+      final profile = ref.read(accessibilityProfileProvider);
+      if (next is RouteActive && next.currentStep != null) {
+        final changedStep = previous is! RouteActive ||
+            previous.stepIndex != next.stepIndex ||
+            previous.route.routeId != next.route.routeId;
+        if (changedStep) {
+          guidance.cueStep(next.currentStep!, profile);
+        }
+      }
+    });
 
     if (selection == null) {
       return Scaffold(

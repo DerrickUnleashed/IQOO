@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_spacing.dart';
+import '../../guidance/domain/guidance_engine.dart';
 import '../domain/camera_controller.dart';
 import '../domain/scene_overlay.dart';
 import '../domain/scene_pipeline.dart';
@@ -164,6 +165,15 @@ class _CameraViewState extends ConsumerState<_CameraView> {
     final isTorchOn = widget.isTorchOn;
     final notifier = ref.read(cameraStateProvider.notifier);
     final annotations = ref.watch(sceneAnnotationsProvider);
+
+    // Spoken + haptic alerts for urgent objects in the live scene.
+    ref.listen(scenePipelineStateProvider, (previous, next) {
+      if (next is SceneLive) {
+        ref
+            .read(guidanceEngineProvider)
+            .announceUrgentScene(next.sceneObjects);
+      }
+    });
 
     return Stack(
       fit: StackFit.expand,
