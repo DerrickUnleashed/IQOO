@@ -142,10 +142,12 @@ class _CameraView extends ConsumerStatefulWidget {
   ConsumerState<_CameraView> createState() => _CameraViewState();
 }
 
-class _CameraViewState extends ConsumerState<_CameraView> {
+class _CameraViewState extends ConsumerState<_CameraView>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Start the perception pipeline against the live camera feed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
@@ -156,8 +158,25 @@ class _CameraViewState extends ConsumerState<_CameraView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     ref.read(scenePipelineStateProvider.notifier).detach();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final pipeline = ref.read(scenePipelineStateProvider.notifier);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.inactive) {
+      // Stop analyzing frames while the feed is not visible.
+      pipeline.detach();
+    } else if (state == AppLifecycleState.resumed) {
+      // Re-wire the perception pipeline on return to the foreground.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) pipeline.attachCamera(widget.controller);
+      });
+    }
   }
 
   @override

@@ -88,7 +88,7 @@ class HomeScreen extends ConsumerWidget {
                     child: _HomeActionTile(
                       icon: Icons.chat_bubble_outline_rounded,
                       label: 'Ask Copilot',
-                      onTap: () {},
+                      onTap: () => context.push(AppRoute.assistance),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -104,7 +104,7 @@ class HomeScreen extends ConsumerWidget {
                     child: _HomeActionTile(
                       icon: Icons.visibility_outlined,
                       label: 'Scan Environment',
-                      onTap: () {},
+                      onTap: () => context.push(AppRoute.assistance),
                     ),
                   ),
                 ],

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,6 +10,7 @@ import '../../features/onboarding/presentation/accessibility_preferences_screen.
 import '../../features/onboarding/presentation/onboarding_flow_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/routing/presentation/routes_screen.dart';
+import '../../shared/widgets/not_found_screen.dart';
 
 /// The application's route names, kept as constants to avoid typos.
 abstract class AppRoute {
@@ -18,6 +20,7 @@ abstract class AppRoute {
   static const assistance = '/assistance';
   static const profile = '/profile';
   static const buildings = '/buildings';
+  static const buildingsDetail = '/buildings/:buildingId';
   static const routes = '/routes';
 }
 
@@ -26,8 +29,17 @@ abstract class AppRoute {
 /// The router redirects to onboarding until the user has completed it,
 /// keeping the decision in one place.
 final appRouterProvider = Provider<GoRouter>((ref) {
+  // Re-run redirects when onboarding state settles (it hydrates asynchronously
+  // from local storage), so a returning user is never left on onboarding.
+  final redirectRefresh = _RedirectRefreshNotifier();
+  ref.listen(onboardingCompletedProvider, (previous, next) {
+    if (previous != next) redirectRefresh.notify();
+  });
+
   return GoRouter(
     initialLocation: AppRoute.home,
+    refreshListenable: redirectRefresh,
+    errorBuilder: (context, state) => const NotFoundScreen(),
     redirect: (context, state) {
       final onboardingComplete = ref.read(onboardingCompletedProvider);
       final onOnboarding = state.matchedLocation.startsWith(
@@ -69,7 +81,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':buildingId',
-            name: '${AppRoute.buildings}/:buildingId',
+            name: AppRoute.buildingsDetail,
             builder: (context, state) => BuildingDetailScreen(
               building: state.extra as dynamic,
             ),
@@ -93,6 +105,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      // Catch-all so a mistyped path never dead-ends on a blank screen.
+      GoRoute(
+        path: '/:path(.*)',
+        name: 'notFound',
+        builder: (context, state) => const NotFoundScreen(),
+      ),
     ],
   );
 });
+
+/// Bridges provider state changes into GoRouter's refreshListenable.
+class _RedirectRefreshNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
