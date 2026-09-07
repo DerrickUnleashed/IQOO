@@ -11,11 +11,14 @@ from collections import OrderedDict
 from datetime import datetime, timezone
 from typing import Any
 
+from app.core.logging import stage_logger
 from app.schemas.common import Direction
 from app.schemas.perception import Detection
 from app.schemas.scene import SceneObject
 
 _MAX_OBJECTS_PER_SESSION = 24
+
+_log = stage_logger("scene")
 
 
 class SceneGraphService:
@@ -30,6 +33,12 @@ class SceneGraphService:
     ) -> dict[str, Any]:
         with self._lock:
             graph = self._sessions.setdefault(session_id, OrderedDict())
+
+            _log.debug(
+                "scene update applying detections",
+                session_id=session_id,
+                detections=len(detections),
+            )
 
             for detection in detections:
                 key = detection.object_type

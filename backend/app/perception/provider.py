@@ -8,7 +8,10 @@ the contract the whole pipeline depends on.
 import abc
 from typing import Any
 
+from app.core.logging import stage_logger
 from app.schemas.perception import Detection
+
+_log = stage_logger("perception")
 
 
 class PerceptionProvider(abc.ABC):
@@ -28,6 +31,7 @@ class NotConfiguredPerceptionProvider(PerceptionProvider):
     name = "not_configured"
 
     async def analyze_frame(self, frame: bytes) -> list[Detection]:
+        _log.warning("perception engine not configured; returning empty detections")
         return []
 
 

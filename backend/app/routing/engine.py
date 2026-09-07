@@ -7,9 +7,12 @@ swapped independently of the agent.
 
 import abc
 
+from app.core.logging import stage_logger
 from app.schemas.common import Location
 from app.schemas.profile import AccessibilityProfile
 from app.schemas.route import Route, RouteStep
+
+_log = stage_logger("routes")
 
 
 class RouteEngine(abc.ABC):
@@ -48,6 +51,10 @@ class NotConfiguredRouteEngine(RouteEngine):
         destination: Location,
         profile: AccessibilityProfile,
     ) -> Route:
+        _log.warning(
+            "route engine not configured; returning degraded route",
+            origin=(origin.latitude, origin.longitude),
+        )
         return Route(
             route_id="degraded",
             distance_m=0.0,

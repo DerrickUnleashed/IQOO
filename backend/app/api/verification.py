@@ -2,12 +2,15 @@
 
 from fastapi import APIRouter
 
+from app.core.logging import stage_logger
 from app.schemas.assistant import (
     VerificationRequest,
     VerificationResult,
 )
 
 router = APIRouter(tags=["verification"])
+
+_log = stage_logger("verification")
 
 
 def _verify(req: VerificationRequest) -> VerificationResult:
@@ -23,6 +26,12 @@ def _verify(req: VerificationRequest) -> VerificationResult:
     ]
 
     if blocked:
+        _log.warning(
+            "verification failed: temporary blockage visible",
+            action_id=req.action_id,
+            session_id=req.session_id,
+            replan_required=True,
+        )
         return VerificationResult(
             action_id=req.action_id,
             verified=False,
@@ -33,6 +42,11 @@ def _verify(req: VerificationRequest) -> VerificationResult:
 
     detected = any(o.currently_visible and o.confidence >= 0.5 for o in relevant)
     if detected:
+        _log.info(
+            "verification passed: expected scene element confirmed",
+            action_id=req.action_id,
+            session_id=req.session_id,
+        )
         return VerificationResult(
             action_id=req.action_id,
             verified=True,
@@ -40,6 +54,11 @@ def _verify(req: VerificationRequest) -> VerificationResult:
             message="The expected scene element was confirmed.",
         )
 
+    _log.debug(
+        "verification inconclusive: no confirming evidence",
+        action_id=req.action_id,
+        session_id=req.session_id,
+    )
     return VerificationResult(
         action_id=req.action_id,
         verified=False,

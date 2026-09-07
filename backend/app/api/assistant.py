@@ -2,9 +2,12 @@
 
 from fastapi import APIRouter
 
+from app.core.logging import stage_logger
 from app.schemas.assistant import AssistantQuery, AssistantResponse
 
 router = APIRouter(tags=["assistant"])
+
+_log = stage_logger("assistant")
 
 
 @router.post("/assistant/query", response_model=AssistantResponse)
@@ -16,6 +19,12 @@ async def assistant_query(req: AssistantQuery) -> AssistantResponse:
     """
     text = req.text.strip()
     lowered = text.lower()
+
+    _log.info(
+        "assistant query received",
+        session_id=req.session_id,
+        intent=req.intent,
+    )
 
     if req.intent == "system_status":
         return AssistantResponse(
