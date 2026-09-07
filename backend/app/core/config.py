@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8080"]
 
     # Database
-    DATABASE_URL: str = "postgresql://user:password@localhost:5432/accesscopilot"
+    DATABASE_URL: str = "postgresql+psycopg://user:password@localhost:5432/accesscopilot"
 
     # Auth
     SECRET_KEY: str = "dev-secret-change-in-production"

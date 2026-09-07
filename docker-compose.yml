@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   db:
     image: postgis/postgis:15-3.4
@@ -25,7 +23,7 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-accesscopilot}
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-accesscopilot}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - SECRET_KEY=${SECRET_KEY}
       - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
