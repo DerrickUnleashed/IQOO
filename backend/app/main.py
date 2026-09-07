@@ -1,11 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.router import api_router
 from app.core.config import settings
+from app.core.logging import configure_logging
+
+configure_logging()
 
 app = FastAPI(
-    title="AccessCopilot API",
-    description="AI-powered accessibility action engine",
-    version="0.1.0",
+    title=settings.APP_NAME,
+    description="AI-powered accessibility action engine backend.",
+    version=settings.APP_VERSION,
+    # No docs in production.
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
 )
 
 app.add_middleware(
@@ -16,7 +24,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "accesscopilot"}
+app.include_router(api_router)
