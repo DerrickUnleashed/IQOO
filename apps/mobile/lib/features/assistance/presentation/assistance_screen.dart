@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/index.dart';
 import '../../guidance/domain/guidance_engine.dart';
 import '../domain/camera_controller.dart';
 import '../domain/scene_overlay.dart';
@@ -189,6 +190,7 @@ class _CameraViewState extends ConsumerState<_CameraView> {
             ),
           ),
         ),
+        const OfflineBanner(),
         SafeArea(
           child: Column(
             children: [

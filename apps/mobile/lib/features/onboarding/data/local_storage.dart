@@ -12,6 +12,7 @@ abstract class StorageKeys {
   static const onboardingCompleted = 'onboarding_completed';
   static const accessibilityProfile = 'accessibility_profile';
   static const appSession = 'app_session';
+  static const eventQueue = 'event_queue';
 }
 
 /// Local persistence layer for the user profile and onboarding state.
@@ -67,5 +68,17 @@ class LocalStorage {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Persists the pending offline event queue (JSON lines).
+  Future<void> saveEventQueue(List<String> events) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(StorageKeys.eventQueue, events);
+  }
+
+  Future<List<String>> loadEventQueue() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(StorageKeys.eventQueue) ?? const [];
+    return List<String>.from(raw);
   }
 }

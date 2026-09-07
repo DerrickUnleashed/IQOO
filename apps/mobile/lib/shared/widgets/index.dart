@@ -12,4 +12,5 @@ export 'app_buttons.dart'
         VoiceButton;
 export 'instruction_card.dart'
     show DestinationCard, InstructionCard, InstructionTone;
+export 'offline_banner.dart' show OfflineBanner;
 export 'route_card.dart' show RouteCard;

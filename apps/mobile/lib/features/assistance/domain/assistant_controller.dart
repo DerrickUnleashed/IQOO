@@ -6,6 +6,7 @@ import '../../../core/api/api_client.g.dart' as api;
 import '../../../core/domain/services/haptics.dart';
 import '../../../core/domain/services/speech_recognizer.dart';
 import '../../../core/domain/services/speech_synthesizer.dart';
+import '../../offline/domain/offline_controller.dart';
 import '../../onboarding/domain/app_client_providers.dart';
 import '../../onboarding/domain/session_controller.dart';
 
@@ -143,6 +144,9 @@ class AssistantController extends Notifier<AssistantConversation> {
       );
       state = ConversationReplied(messages: _messages);
 
+      ref.read(connectivityProvider.notifier).noteSuccess();
+      await _flushQueue();
+
       if (action != null && action.haptics != null) {
         try {
           await ref.read(hapticsProvider).forAction(action.haptics!);
@@ -154,10 +158,56 @@ class AssistantController extends Notifier<AssistantConversation> {
       if (tts.isAvailable) await tts.speak(response.reply);
     } on Exception {
       if (!ref.mounted) return;
+      // The command is queued and will be replayed when the network
+      // comes back instead of being silently dropped.
+      ref.read(connectivityProvider.notifier).noteFailure();
+      await ref.read(eventQueueProvider.notifier).enqueue(
+        CachedEvent(
+          id: '',
+          kind: 'assistant',
+          payload: {'text': trimmed},
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+        ),
+      );
       state = ConversationUnavailable(
-        reason: 'I could not reach the copilot. Check your connection and try again.',
+        reason: 'You are offline. Your question is saved and will be sent '
+            'automatically when the connection returns.',
         messages: _messages,
       );
+    }
+  }
+
+  /// Replays any queued assistant commands once connectivity is back.
+  Future<void> _flushQueue() async {
+    final queue = ref.read(eventQueueProvider.notifier);
+    if (queue.length == 0) return;
+
+    final session = ref.read(sessionControllerProvider);
+    final client = ref.read(apiClientProvider);
+    final replies = <String>[];
+    await queue.flush((event) async {
+      if (event.kind != 'assistant') return true;
+      try {
+        final response = await client.assistantQuery(
+          body: api.AssistantQuery(
+            sessionId: session.sessionId,
+            text: event.payload['text'] as String? ?? '',
+          ),
+        );
+        replies.add(response.reply);
+        return true;
+      } on Exception {
+        return false;
+      }
+    });
+    if (!ref.mounted) return;
+    if (replies.isNotEmpty) {
+      _messages.addAll(
+        replies.map((r) => AssistantMessage(role: 'copilot', text: r)),
+      );
+      state = ConversationReplied(messages: _messages);
+      final tts = ref.read(speechSynthesizerProvider);
+      if (tts.isAvailable) await tts.speak(replies.last);
     }
   }
 

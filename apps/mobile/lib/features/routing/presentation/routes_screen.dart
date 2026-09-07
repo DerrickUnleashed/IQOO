@@ -46,44 +46,51 @@ class RoutesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Route')),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: switch (state) {
-            RouteIdle() => _DestinationPicker(building: selection),
-            RouteCalculating() => const Center(
-                child: CircularProgressIndicator(),
-              ),
-            RouteActive(:final route, :final stepIndex, :final destinationLabel, :final lastVerification) =>
-              _StepNavigator(
-                route: route,
-                stepIndex: stepIndex,
-                destination: destinationLabel ?? selection.name,
-                lastVerification: lastVerification,
-                onPrevious: () =>
-                    ref.read(routeControllerProvider.notifier).previousStep(),
-                onNext: () =>
-                    ref.read(routeControllerProvider.notifier).nextStep(),
-                onVerify: () =>
-                    ref.read(routeControllerProvider.notifier).verifyCurrentStep(),
-                onReplan: () =>
-                    ref.read(routeControllerProvider.notifier).replan(
-                      reason: lastVerification?.message,
+        child: Column(
+          children: [
+            const OfflineBanner(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: switch (state) {
+                  RouteIdle() => _DestinationPicker(building: selection),
+                  RouteCalculating() => const Center(
+                      child: CircularProgressIndicator(),
                     ),
-                onDone: () {
-                  ref.read(routeControllerProvider.notifier).reset();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('You have arrived.'),
-                      behavior: SnackBarBehavior.floating,
+                  RouteActive(:final route, :final stepIndex, :final destinationLabel, :final lastVerification) =>
+                    _StepNavigator(
+                      route: route,
+                      stepIndex: stepIndex,
+                      destination: destinationLabel ?? selection.name,
+                      lastVerification: lastVerification,
+                      onPrevious: () =>
+                          ref.read(routeControllerProvider.notifier).previousStep(),
+                      onNext: () =>
+                          ref.read(routeControllerProvider.notifier).nextStep(),
+                      onVerify: () =>
+                          ref.read(routeControllerProvider.notifier).verifyCurrentStep(),
+                      onReplan: () =>
+                          ref.read(routeControllerProvider.notifier).replan(
+                            reason: lastVerification?.message,
+                          ),
+                      onDone: () {
+                        ref.read(routeControllerProvider.notifier).reset();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('You have arrived.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
                     ),
-                  );
+                  RouteFailed(:final reason) => _PlannerError(
+                      reason: reason,
+                      onRetry: () => ref.read(routeControllerProvider.notifier).reset(),
+                    ),
                 },
               ),
-            RouteFailed(:final reason) => _PlannerError(
-                reason: reason,
-                onRetry: () => ref.read(routeControllerProvider.notifier).reset(),
-              ),
-          },
+            ),
+          ],
         ),
       ),
     );

@@ -83,6 +83,7 @@ class _MemoryStorage implements LocalStorage {
   bool _completed = false;
   AccessibilityProfile? _profile;
   AppSession? _session;
+  List<String> _queue = [];
 
   @override
   Future<void> setOnboardingCompleted(bool completed) async {
@@ -107,4 +108,12 @@ class _MemoryStorage implements LocalStorage {
 
   @override
   Future<AppSession?> loadSession() async => _session;
+
+  @override
+  Future<void> saveEventQueue(List<String> events) async {
+    _queue = events;
+  }
+
+  @override
+  Future<List<String>> loadEventQueue() async => _queue;
 }
