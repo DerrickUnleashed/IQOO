@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/domain/models/accessibility_profile.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/preference_group.dart';
+import '../../demo/domain/demo_mode.dart';
 import '../../onboarding/domain/onboarding_providers.dart';
 
 /// The personalized profile screen.
@@ -107,6 +108,14 @@ class ProfileScreen extends ConsumerWidget {
               detail: 'Play a tone when the route changes',
               enabled: true,
             ),
+            const SizedBox(height: AppSpacing.xxl),
+
+            const _SectionHeader(
+              title: 'Demo mode',
+              icon: Icons.science_outlined,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const _DemoModeSwitch(),
             const SizedBox(height: AppSpacing.xxl),
           ],
         ),
@@ -304,6 +313,27 @@ class _SettingSwitch extends StatelessWidget {
       subtitle: Text(detail),
       value: enabled,
       onChanged: null,
+    );
+  }
+}
+
+class _DemoModeSwitch extends ConsumerWidget {
+  const _DemoModeSwitch();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enabled = ref.watch(demoModeProvider);
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      secondary: const Icon(Icons.science_outlined),
+      title: const Text('Try the demo'),
+      subtitle: Text(
+        enabled
+            ? 'Using built-in demo data instead of the live service.'
+            : 'Explore the app with sample data — no server needed.',
+      ),
+      value: enabled,
+      onChanged: (_) => ref.read(demoModeProvider.notifier).toggle(),
     );
   }
 }

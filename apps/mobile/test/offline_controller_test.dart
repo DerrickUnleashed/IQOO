@@ -17,11 +17,8 @@ import 'package:accesscopilot/features/onboarding/domain/app_client_providers.da
 import 'package:accesscopilot/features/onboarding/data/local_storage.dart';
 
 class _FakeSpeech implements SpeechRecognizer {
-  final bool available;
-  _FakeSpeech({this.available = true});
-
   @override
-  bool get isAvailable => available;
+  bool get isAvailable => true;
 
   @override
   SpeechStatus get status => SpeechStatus.idle;

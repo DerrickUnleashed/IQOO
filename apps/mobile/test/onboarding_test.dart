@@ -107,6 +107,7 @@ void main() {
 
 class _MemoryStorage implements LocalStorage {
   bool _completed = false;
+  bool _demo = false;
   AccessibilityProfile? _profile;
   AppSession? _session;
   List<String> _queue = [];
@@ -142,4 +143,12 @@ class _MemoryStorage implements LocalStorage {
 
   @override
   Future<List<String>> loadEventQueue() async => _queue;
+
+  @override
+  Future<bool> isDemoModeEnabled() async => _demo;
+
+  @override
+  Future<void> setDemoModeEnabled(bool enabled) async {
+    _demo = enabled;
+  }
 }

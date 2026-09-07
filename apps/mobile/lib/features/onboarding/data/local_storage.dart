@@ -13,6 +13,7 @@ abstract class StorageKeys {
   static const accessibilityProfile = 'accessibility_profile';
   static const appSession = 'app_session';
   static const eventQueue = 'event_queue';
+  static const demoMode = 'demo_mode';
 }
 
 /// Local persistence layer for the user profile and onboarding state.
@@ -80,5 +81,16 @@ class LocalStorage {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(StorageKeys.eventQueue) ?? const [];
     return List<String>.from(raw);
+  }
+
+  /// Whether built-in demo data is used instead of the live backend.
+  Future<bool> isDemoModeEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(StorageKeys.demoMode) ?? false;
+  }
+
+  Future<void> setDemoModeEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(StorageKeys.demoMode, enabled);
   }
 }

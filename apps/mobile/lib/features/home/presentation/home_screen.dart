@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/index.dart';
+import '../../demo/domain/demo_mode.dart';
 
 /// The assistant home screen.
 ///
@@ -66,6 +67,10 @@ class HomeScreen extends ConsumerWidget {
                   color: scheme.onSurfaceVariant,
                 ),
               ),
+              if (ref.watch(demoModeProvider)) ...[
+                const SizedBox(height: AppSpacing.md),
+                const _DemoChip(),
+              ],
               const SizedBox(height: AppSpacing.xxl),
 
               // Primary call to action.
@@ -134,6 +139,42 @@ class HomeScreen extends ConsumerWidget {
 }
 
 /// Compact secondary action tile used under the primary CTA.
+class _DemoChip extends StatelessWidget {
+  const _DemoChip();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      label: 'Demo mode is on',
+      child: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: scheme.tertiaryContainer,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.science_outlined, size: 16, color: scheme.onTertiaryContainer),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              'Demo mode',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: scheme.onTertiaryContainer,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _HomeActionTile extends StatelessWidget {
   const _HomeActionTile({
     required this.icon,
