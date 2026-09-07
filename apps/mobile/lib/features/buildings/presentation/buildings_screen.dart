@@ -136,16 +136,10 @@ class BuildingDetailScreen extends ConsumerWidget {
                     PrimaryButton(
                       onPressed: () {
                         ref.read(buildingSelectionProvider.notifier).select(building);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                '${building.name} selected — route to it next'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
+                        context.push(AppRoute.routes);
                       },
-                      icon: Icons.check_rounded,
-                      child: const Text('Select This Place'),
+                      icon: Icons.directions_rounded,
+                      child: const Text('Route Here'),
                     ),
                   ],
                 ),

@@ -20,6 +20,19 @@ class ApiProfileMapper {
     );
   }
 
+  /// Wire DTO for route requests (backend accepts the raw profile).
+  static api.AccessibilityProfile toApi(AccessibilityProfile profile) {
+    return api.AccessibilityProfile(
+      mobility: profile.mobility.storageKey,
+      vision: profile.vision.storageKey,
+      hearing: profile.hearing.storageKey,
+      guidanceStyle: profile.guidanceStyle.storageKey,
+      walkingSpeedMps: profile.walkingSpeedMps,
+      maxComfortableDistanceM: profile.maxComfortableDistanceM,
+      cognitiveLoadPreference: profile.cognitiveLoadPreference,
+    );
+  }
+
   static AccessibilityProfile fromApi(api.AccessibilityProfile dto) {
     return AccessibilityProfile(
       mobility: MobilityAssistance.fromStorageKey(dto.mobility ?? 'none'),

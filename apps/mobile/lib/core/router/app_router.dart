@@ -8,6 +8,7 @@ import '../../features/onboarding/domain/onboarding_providers.dart';
 import '../../features/onboarding/presentation/accessibility_preferences_screen.dart';
 import '../../features/onboarding/presentation/onboarding_flow_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/routing/presentation/routes_screen.dart';
 
 /// The application's route names, kept as constants to avoid typos.
 abstract class AppRoute {
@@ -17,6 +18,7 @@ abstract class AppRoute {
   static const assistance = '/assistance';
   static const profile = '/profile';
   static const buildings = '/buildings';
+  static const routes = '/routes';
 }
 
 /// Provides the [GoRouter] instance for the application.
@@ -73,6 +75,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoute.routes,
+        name: AppRoute.routes,
+        builder: (context, state) => const RoutesScreen(),
       ),
       GoRoute(
         path: AppRoute.onboarding,
