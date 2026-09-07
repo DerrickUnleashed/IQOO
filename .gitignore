@@ -14,13 +14,13 @@ apps/mobile/.packages
 apps/mobile/build/
 apps/mobile/.flutter-plugins
 apps/mobile/.flutter-plugins-dependencies
-apps/mobile/pubspec.lock
-apps/mobile/.metadata
 apps/mobile/android/.gradle/
 apps/mobile/android/app/build/
 apps/mobile/android/local.properties
 apps/mobile/ios/Pods/
 apps/mobile/ios/.symlinks/
+apps/mobile/build/
+apps/mobile/web/.dart_tool/
 apps/mobile/ios/Flutter/Flutter.framework
 apps/mobile/ios/Flutter/Flutter.podspec
 
