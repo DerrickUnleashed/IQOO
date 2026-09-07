@@ -10,6 +10,20 @@ from app.services import BuildingService
 router = APIRouter(tags=["buildings"])
 
 
+@router.get("/buildings", response_model=list[BuildingOut])
+def list_buildings(db: OrmSession = Depends(get_db)) -> list[BuildingOut]:
+    buildings = BuildingService(db).list_buildings()
+    return [
+        BuildingOut(
+            id=building.id,
+            name=building.name,
+            address=building.address,
+            has_floor_plan=len(building.floors) > 0,
+        )
+        for building in buildings
+    ]
+
+
 @router.get("/buildings/{building_id}", response_model=BuildingOut)
 def get_building(
     building_id: int,

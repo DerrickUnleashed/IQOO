@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.db.base import SessionLocal
+from app.models import Building
 from app.models import Session as SessionModel
 from app.models import User
 
@@ -70,6 +71,37 @@ def test_profile_roundtrip(device_id: str) -> None:
         assert profile["guidance_style"] == "detailed"
     finally:
         _cleanup(device_id)
+
+
+def test_building_list_and_detail_roundtrip() -> None:
+    db = SessionLocal()
+    try:
+        building = Building(name="Test Pavilion", address="1 Test Way")
+        db.add(building)
+        db.commit()
+        db.refresh(building)
+        building_id = building.id
+    finally:
+        db.close()
+
+    try:
+        response = client.get("/api/v1/buildings")
+        assert response.status_code == 200
+        ids = [b["id"] for b in response.json()]
+        assert building_id in ids
+
+        detail = client.get(f"/api/v1/buildings/{building_id}")
+        assert detail.status_code == 200
+        body = detail.json()
+        assert body["name"] == "Test Pavilion"
+        assert body["has_floor_plan"] is False
+    finally:
+        db = SessionLocal()
+        try:
+            db.query(Building).filter(Building.id == building_id).delete()
+            db.commit()
+        finally:
+            db.close()
 
 
 def test_building_missing_returns_404() -> None:

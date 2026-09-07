@@ -1,1 +1,1771 @@
-{"openapi":"3.1.0","info":{"title":"AccessCopilot API","description":"AI-powered accessibility action engine backend.","version":"0.1.0"},"paths":{"/api/v1/health":{"get":{"tags":["health"],"summary":"Health","description":"Basic liveness check.","operationId":"health_api_v1_health_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"additionalProperties":true,"type":"object","title":"Response Health Api V1 Health Get"}}}}}}},"/api/v1/readiness":{"get":{"tags":["health"],"summary":"Readiness","description":"Readiness check including capability info.\n\n``ai_enabled`` reflects whether cloud AI capabilities (Gemini) are\nconfigured; the service degrades gracefully when it is false.","operationId":"readiness_api_v1_readiness_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"additionalProperties":true,"type":"object","title":"Response Readiness Api V1 Readiness Get"}}}}}}},"/api/v1/auth/session":{"post":{"tags":["auth"],"summary":"Create Auth Session","description":"Exchange a device id for a session (the app's identity model).","operationId":"create_auth_session_api_v1_auth_session_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/SessionCreate"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SessionOut"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/users/me":{"get":{"tags":["users"],"summary":"Get Me","description":"Return the current user (identified by device id for now).","operationId":"get_me_api_v1_users_me_get","parameters":[{"name":"device_id","in":"query","required":true,"schema":{"type":"string","title":"Device Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserOut"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/users/me/profile":{"get":{"tags":["users"],"summary":"Get Profile","operationId":"get_profile_api_v1_users_me_profile_get","parameters":[{"name":"device_id","in":"query","required":true,"schema":{"type":"string","title":"Device Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AccessibilityProfile"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"put":{"tags":["users"],"summary":"Update Profile","operationId":"update_profile_api_v1_users_me_profile_put","parameters":[{"name":"device_id","in":"query","required":true,"schema":{"type":"string","title":"Device Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProfileUpdate"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AccessibilityProfile"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/buildings/{building_id}":{"get":{"tags":["buildings"],"summary":"Get Building","operationId":"get_building_api_v1_buildings__building_id__get","parameters":[{"name":"building_id","in":"path","required":true,"schema":{"type":"integer","title":"Building Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/BuildingOut"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/buildings/{building_id}/accessibility":{"get":{"tags":["buildings"],"summary":"Get Building Accessibility","operationId":"get_building_accessibility_api_v1_buildings__building_id__accessibility_get","parameters":[{"name":"building_id","in":"path","required":true,"schema":{"type":"integer","title":"Building Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/BuildingAccessibilityOut"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/perception/analyze":{"post":{"tags":["perception"],"summary":"Analyze Frame","operationId":"analyze_frame_api_v1_perception_analyze_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/AnalyzeFrameRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AnalyzeFrameResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/scene/update":{"post":{"tags":["perception"],"summary":"Update Scene","description":"Apply detections to the stateful scene graph for a session.","operationId":"update_scene_api_v1_scene_update_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/SceneUpdate"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SceneUpdateResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/routes/calculate":{"post":{"tags":["routes"],"summary":"Calculate Route","description":"Calculate an accessibility-aware route for the user's profile.","operationId":"calculate_route_api_v1_routes_calculate_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RouteRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Route"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/routes/replan":{"post":{"tags":["routes"],"summary":"Replan Route","description":"Replan from the current position when the route is blocked.","operationId":"replan_route_api_v1_routes_replan_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ReplanRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Route"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/verification/check":{"post":{"tags":["verification"],"summary":"Check Verification","operationId":"check_verification_api_v1_verification_check_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/VerificationRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/VerificationResult"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/assistant/query":{"post":{"tags":["assistant"],"summary":"Assistant Query","description":"Handle a user's voice/text command.\n\nThe LangGraph agent gets wired here in the agent milestone. Until\nthen a deterministic fallback provides graceful degraded responses.","operationId":"assistant_query_api_v1_assistant_query_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/AssistantQuery"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AssistantResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/api/v1/ping":{"get":{"summary":"Ping","description":"Minimal endpoint for connectivity checks from the mobile app.","operationId":"ping_api_v1_ping_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"additionalProperties":true,"type":"object","title":"Response Ping Api V1 Ping Get"}}}}}}}},"components":{"schemas":{"AccessibilityProfile":{"properties":{"mobility":{"type":"string","enum":["none","temporary_mobility","wheelchair","walking_aid","cane"],"title":"Mobility","default":"none"},"vision":{"type":"string","enum":["none","temporary_vision","low_vision","blind"],"title":"Vision","default":"none"},"hearing":{"type":"string","enum":["none","hearing_aid","deaf"],"title":"Hearing","default":"none"},"guidance_style":{"type":"string","enum":["concise","normal","detailed"],"title":"Guidance Style","default":"normal"},"walking_speed_mps":{"type":"number","maximum":4.0,"exclusiveMinimum":0.0,"title":"Walking Speed Mps","default":1.2},"max_comfortable_distance_m":{"type":"integer","maximum":10000.0,"minimum":10.0,"title":"Max Comfortable Distance M","default":100},"cognitive_load_preference":{"type":"integer","maximum":3.0,"minimum":1.0,"title":"Cognitive Load Preference","default":1}},"type":"object","title":"AccessibilityProfile","description":"Recommendations are derived from this profile."},"Action":{"properties":{"title":{"type":"string","title":"Title"},"detail":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Detail"},"kind":{"type":"string","title":"Kind","default":"instruction"},"confidence":{"type":"number","maximum":1.0,"minimum":0.0,"title":"Confidence","default":0.5},"haptics":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Haptics"}},"type":"object","required":["title"],"title":"Action","description":"The recommended next action — the core product output."},"AnalyzeFrameRequest":{"properties":{"frame_id":{"type":"string","title":"Frame Id"},"session_id":{"type":"string","title":"Session Id"},"encoded_frame":{"anyOf":[{"type":"string","contentMediaType":"application/octet-stream"},{"type":"null"}],"title":"Encoded Frame"},"source":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Source"}},"type":"object","required":["frame_id","session_id"],"title":"AnalyzeFrameRequest","description":"A single frame sent for analysis (frames are throttled client-side)."},"AnalyzeFrameResponse":{"properties":{"frame_id":{"type":"string","title":"Frame Id"},"detections":{"items":{"$ref":"#/components/schemas/Detection"},"type":"array","title":"Detections"},"scene_summary":{"additionalProperties":true,"type":"object","title":"Scene Summary"},"processing_ms":{"type":"integer","minimum":0.0,"title":"Processing Ms","default":0}},"type":"object","required":["frame_id","detections"],"title":"AnalyzeFrameResponse","description":"Structured result; raw frames are never stored."},"AssistantQuery":{"properties":{"session_id":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Session Id"},"text":{"type":"string","title":"Text"},"intent":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Intent"}},"type":"object","required":["text"],"title":"AssistantQuery","description":"A voice-text command from the user (Whisper transcript)."},"AssistantResponse":{"properties":{"reply":{"type":"string","title":"Reply"},"action":{"anyOf":[{"$ref":"#/components/schemas/Action"},{"type":"null"}]},"detections":{"items":{"$ref":"#/components/schemas/SceneObject"},"type":"array","title":"Detections"},"route_change":{"type":"boolean","title":"Route Change","default":false},"debug":{"additionalProperties":true,"type":"object","title":"Debug"}},"type":"object","required":["reply"],"title":"AssistantResponse","description":"Natural-language response, always grounded in structured state."},"BuildingAccessibilityOut":{"properties":{"building_id":{"type":"integer","title":"Building Id"},"accessible_entrances":{"items":{"$ref":"#/components/schemas/Location"},"type":"array","title":"Accessible Entrances"},"elevators":{"type":"integer","title":"Elevators","default":0},"ramps":{"type":"integer","title":"Ramps","default":0},"wheelchair_accessible_floors":{"items":{"type":"integer"},"type":"array","title":"Wheelchair Accessible Floors"},"notes":{"items":{"type":"string"},"type":"array","title":"Notes"}},"type":"object","required":["building_id"],"title":"BuildingAccessibilityOut"},"BuildingOut":{"properties":{"id":{"type":"integer","title":"Id"},"name":{"type":"string","title":"Name"},"address":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Address"},"has_floor_plan":{"type":"boolean","title":"Has Floor Plan","default":false}},"type":"object","required":["id","name"],"title":"BuildingOut"},"Detection":{"properties":{"object_type":{"type":"string","title":"Object Type"},"confidence":{"type":"number","maximum":1.0,"minimum":0.0,"title":"Confidence"},"estimated_distance_m":{"anyOf":[{"type":"number","minimum":0.0},{"type":"null"}],"title":"Estimated Distance M"},"distance_confidence":{"anyOf":[{"type":"number","maximum":1.0,"minimum":0.0},{"type":"null"}],"title":"Distance Confidence"},"direction":{"$ref":"#/components/schemas/Direction","default":"front"},"bbox":{"anyOf":[{"items":{"type":"number"},"type":"array","maxItems":4,"minItems":4},{"type":"null"}],"title":"Bbox"},"text":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Text"},"source":{"type":"string","title":"Source","default":"detector"},"attributes":{"additionalProperties":true,"type":"object","title":"Attributes"}},"type":"object","required":["object_type","confidence"],"title":"Detection","description":"A single perceived object, fused from detection + depth + OCR."},"Direction":{"type":"string","enum":["front","left","right","behind"],"title":"Direction"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"Location":{"properties":{"latitude":{"type":"number","maximum":90.0,"minimum":-90.0,"title":"Latitude"},"longitude":{"type":"number","maximum":180.0,"minimum":-180.0,"title":"Longitude"},"accuracy_m":{"anyOf":[{"type":"number","minimum":0.0},{"type":"null"}],"title":"Accuracy M"},"floor_level":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Floor Level"}},"type":"object","required":["latitude","longitude"],"title":"Location","description":"A geographic position (WGS84)."},"ProfileUpdate":{"properties":{"mobility":{"anyOf":[{"type":"string","enum":["none","temporary_mobility","wheelchair","walking_aid","cane"]},{"type":"null"}],"title":"Mobility"},"vision":{"anyOf":[{"type":"string","enum":["none","temporary_vision","low_vision","blind"]},{"type":"null"}],"title":"Vision"},"hearing":{"anyOf":[{"type":"string","enum":["none","hearing_aid","deaf"]},{"type":"null"}],"title":"Hearing"},"guidance_style":{"anyOf":[{"type":"string","enum":["concise","normal","detailed"]},{"type":"null"}],"title":"Guidance Style"},"walking_speed_mps":{"anyOf":[{"type":"number","maximum":4.0,"exclusiveMinimum":0.0},{"type":"null"}],"title":"Walking Speed Mps"},"max_comfortable_distance_m":{"anyOf":[{"type":"integer","maximum":10000.0,"minimum":10.0},{"type":"null"}],"title":"Max Comfortable Distance M"},"cognitive_load_preference":{"anyOf":[{"type":"integer","maximum":3.0,"minimum":1.0},{"type":"null"}],"title":"Cognitive Load Preference"}},"type":"object","title":"ProfileUpdate","description":"Partial update; omitted fields keep their current value."},"ReplanRequest":{"properties":{"session_id":{"type":"string","title":"Session Id"},"current":{"$ref":"#/components/schemas/Location"},"destination":{"$ref":"#/components/schemas/Location"},"reason":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Reason"},"profile":{"$ref":"#/components/schemas/AccessibilityProfile","default":{"mobility":"none","vision":"none","hearing":"none","guidance_style":"normal","walking_speed_mps":1.2,"max_comfortable_distance_m":100,"cognitive_load_preference":1}}},"type":"object","required":["session_id","current","destination"],"title":"ReplanRequest","description":"Replan from the current position because the route is blocked."},"Route":{"properties":{"route_id":{"type":"string","title":"Route Id"},"distance_m":{"type":"number","minimum":0.0,"title":"Distance M"},"duration_estimate_s":{"anyOf":[{"type":"integer","minimum":0.0},{"type":"null"}],"title":"Duration Estimate S"},"accessibility_score":{"type":"number","maximum":1.0,"minimum":0.0,"title":"Accessibility Score","default":1.0},"steps":{"items":{"$ref":"#/components/schemas/RouteStep"},"type":"array","title":"Steps"},"cost_breakdown":{"additionalProperties":{"type":"number"},"type":"object","title":"Cost Breakdown"}},"type":"object","required":["route_id","distance_m"],"title":"Route","description":"An accessibility-aware route with a cost breakdown."},"RouteRequest":{"properties":{"session_id":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Session Id"},"origin":{"$ref":"#/components/schemas/Location"},"destination":{"$ref":"#/components/schemas/Location"},"profile":{"$ref":"#/components/schemas/AccessibilityProfile","default":{"mobility":"none","vision":"none","hearing":"none","guidance_style":"normal","walking_speed_mps":1.2,"max_comfortable_distance_m":100,"cognitive_load_preference":1}}},"type":"object","required":["origin","destination"],"title":"RouteRequest","description":"Calculate a route from origin to destination for a user."},"RouteStep":{"properties":{"instruction":{"type":"string","title":"Instruction"},"distance_m":{"anyOf":[{"type":"number","minimum":0.0},{"type":"null"}],"title":"Distance M"},"action_type":{"type":"string","title":"Action Type","default":"walk"},"required_accessibility":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Required Accessibility"},"node_id":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Node Id"},"attributes":{"additionalProperties":true,"type":"object","title":"Attributes"}},"type":"object","required":["instruction"],"title":"RouteStep","description":"A single incremental instruction; one action at a time."},"SceneObject":{"properties":{"id":{"type":"string","title":"Id"},"type":{"type":"string","title":"Type"},"distance_m":{"anyOf":[{"type":"number","minimum":0.0},{"type":"null"}],"title":"Distance M"},"direction":{"$ref":"#/components/schemas/Direction","default":"front"},"accessible":{"anyOf":[{"type":"boolean"},{"type":"null"}],"title":"Accessible"},"temporary_blockage":{"type":"boolean","title":"Temporary Blockage","default":false},"confidence":{"type":"number","maximum":1.0,"minimum":0.0,"title":"Confidence","default":0.5},"currently_visible":{"type":"boolean","title":"Currently Visible","default":true},"state":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"State"},"attributes":{"additionalProperties":true,"type":"object","title":"Attributes"}},"type":"object","required":["id","type"],"title":"SceneObject","description":"A node in the scene graph derived from one or more detections."},"SceneUpdate":{"properties":{"session_id":{"type":"string","title":"Session Id"},"detections":{"items":{"$ref":"#/components/schemas/Detection"},"type":"array","title":"Detections"},"location":{"anyOf":[{"additionalProperties":true,"type":"object"},{"type":"null"}],"title":"Location"}},"type":"object","required":["session_id"],"title":"SceneUpdate","description":"Incremental update of the live scene graph."},"SceneUpdateResponse":{"properties":{"session_id":{"type":"string","title":"Session Id"},"scene_objects":{"items":{"$ref":"#/components/schemas/SceneObject"},"type":"array","title":"Scene Objects"},"updated_at":{"type":"string","format":"date-time","title":"Updated At"},"observation_id":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Observation Id"}},"type":"object","required":["session_id","scene_objects","updated_at"],"title":"SceneUpdateResponse","description":"The merged scene after applying the update."},"SessionCreate":{"properties":{"device_id":{"type":"string","minLength":1,"title":"Device Id"},"mode":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Mode"}},"type":"object","required":["device_id"],"title":"SessionCreate","description":"Start a new assistance session."},"SessionOut":{"properties":{"session_id":{"type":"string","title":"Session Id"},"user_id":{"type":"integer","title":"User Id"},"started_at":{"type":"string","format":"date-time","title":"Started At"},"status":{"type":"string","title":"Status","default":"active"}},"type":"object","required":["session_id","user_id","started_at"],"title":"SessionOut"},"UserOut":{"properties":{"id":{"type":"integer","title":"Id"},"device_id":{"type":"string","title":"Device Id"},"created_at":{"type":"string","format":"date-time","title":"Created At"}},"type":"object","required":["id","device_id","created_at"],"title":"UserOut"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"},"input":{"title":"Input"},"ctx":{"type":"object","title":"Context"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"},"VerificationRequest":{"properties":{"session_id":{"type":"string","title":"Session Id"},"action_id":{"type":"string","title":"Action Id"},"scene_objects":{"items":{"$ref":"#/components/schemas/SceneObject"},"type":"array","title":"Scene Objects"}},"type":"object","required":["session_id","action_id"],"title":"VerificationRequest","description":"Ask the system to verify whether a planned action succeeded."},"VerificationResult":{"properties":{"action_id":{"type":"string","title":"Action Id"},"verified":{"type":"boolean","title":"Verified"},"confidence":{"type":"number","maximum":1.0,"minimum":0.0,"title":"Confidence","default":0.0},"message":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Message"},"replan_required":{"type":"boolean","title":"Replan Required","default":false}},"type":"object","required":["action_id","verified"],"title":"VerificationResult","description":"Closed-loop camera verification of a planned action."}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AccessCopilot API",
+    "description": "AI-powered accessibility action engine backend.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "description": "Basic liveness check.",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Health Api V1 Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/readiness": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readiness",
+        "description": "Readiness check including capability info.\n\n``ai_enabled`` reflects whether cloud AI capabilities (Gemini) are\nconfigured; the service degrades gracefully when it is false.",
+        "operationId": "readiness_api_v1_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Readiness Api V1 Readiness Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/session": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Create Auth Session",
+        "description": "Exchange a device id for a session (the app's identity model).",
+        "operationId": "create_auth_session_api_v1_auth_session_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get Me",
+        "description": "Return the current user (identified by device id for now).",
+        "operationId": "get_me_api_v1_users_me_get",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/me/profile": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get Profile",
+        "operationId": "get_profile_api_v1_users_me_profile_get",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessibilityProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Update Profile",
+        "operationId": "update_profile_api_v1_users_me_profile_put",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessibilityProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/buildings": {
+      "get": {
+        "tags": [
+          "buildings"
+        ],
+        "summary": "List Buildings",
+        "operationId": "list_buildings_api_v1_buildings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BuildingOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Buildings Api V1 Buildings Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/buildings/{building_id}": {
+      "get": {
+        "tags": [
+          "buildings"
+        ],
+        "summary": "Get Building",
+        "operationId": "get_building_api_v1_buildings__building_id__get",
+        "parameters": [
+          {
+            "name": "building_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Building Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/buildings/{building_id}/accessibility": {
+      "get": {
+        "tags": [
+          "buildings"
+        ],
+        "summary": "Get Building Accessibility",
+        "operationId": "get_building_accessibility_api_v1_buildings__building_id__accessibility_get",
+        "parameters": [
+          {
+            "name": "building_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Building Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingAccessibilityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/perception/analyze": {
+      "post": {
+        "tags": [
+          "perception"
+        ],
+        "summary": "Analyze Frame",
+        "operationId": "analyze_frame_api_v1_perception_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeFrameRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeFrameResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scene/update": {
+      "post": {
+        "tags": [
+          "perception"
+        ],
+        "summary": "Update Scene",
+        "description": "Apply detections to the stateful scene graph for a session.",
+        "operationId": "update_scene_api_v1_scene_update_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SceneUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SceneUpdateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/routes/calculate": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Calculate Route",
+        "description": "Calculate an accessibility-aware route for the user's profile.",
+        "operationId": "calculate_route_api_v1_routes_calculate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Route"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/routes/replan": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Replan Route",
+        "description": "Replan from the current position when the route is blocked.",
+        "operationId": "replan_route_api_v1_routes_replan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Route"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/check": {
+      "post": {
+        "tags": [
+          "verification"
+        ],
+        "summary": "Check Verification",
+        "operationId": "check_verification_api_v1_verification_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerificationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/assistant/query": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Query",
+        "description": "Handle a user's voice/text command.\n\nThe LangGraph agent gets wired here in the agent milestone. Until\nthen a deterministic fallback provides graceful degraded responses.",
+        "operationId": "assistant_query_api_v1_assistant_query_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ping": {
+      "get": {
+        "summary": "Ping",
+        "description": "Minimal endpoint for connectivity checks from the mobile app.",
+        "operationId": "ping_api_v1_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ping Api V1 Ping Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessibilityProfile": {
+        "properties": {
+          "mobility": {
+            "type": "string",
+            "enum": [
+              "none",
+              "temporary_mobility",
+              "wheelchair",
+              "walking_aid",
+              "cane"
+            ],
+            "title": "Mobility",
+            "default": "none"
+          },
+          "vision": {
+            "type": "string",
+            "enum": [
+              "none",
+              "temporary_vision",
+              "low_vision",
+              "blind"
+            ],
+            "title": "Vision",
+            "default": "none"
+          },
+          "hearing": {
+            "type": "string",
+            "enum": [
+              "none",
+              "hearing_aid",
+              "deaf"
+            ],
+            "title": "Hearing",
+            "default": "none"
+          },
+          "guidance_style": {
+            "type": "string",
+            "enum": [
+              "concise",
+              "normal",
+              "detailed"
+            ],
+            "title": "Guidance Style",
+            "default": "normal"
+          },
+          "walking_speed_mps": {
+            "type": "number",
+            "maximum": 4.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Walking Speed Mps",
+            "default": 1.2
+          },
+          "max_comfortable_distance_m": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 10.0,
+            "title": "Max Comfortable Distance M",
+            "default": 100
+          },
+          "cognitive_load_preference": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Cognitive Load Preference",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "AccessibilityProfile",
+        "description": "Recommendations are derived from this profile."
+      },
+      "Action": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "default": "instruction"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "default": 0.5
+          },
+          "haptics": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Haptics"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "Action",
+        "description": "The recommended next action \u2014 the core product output."
+      },
+      "AnalyzeFrameRequest": {
+        "properties": {
+          "frame_id": {
+            "type": "string",
+            "title": "Frame Id"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "encoded_frame": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encoded Frame"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "frame_id",
+          "session_id"
+        ],
+        "title": "AnalyzeFrameRequest",
+        "description": "A single frame sent for analysis (frames are throttled client-side)."
+      },
+      "AnalyzeFrameResponse": {
+        "properties": {
+          "frame_id": {
+            "type": "string",
+            "title": "Frame Id"
+          },
+          "detections": {
+            "items": {
+              "$ref": "#/components/schemas/Detection"
+            },
+            "type": "array",
+            "title": "Detections"
+          },
+          "scene_summary": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scene Summary"
+          },
+          "processing_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Processing Ms",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "frame_id",
+          "detections"
+        ],
+        "title": "AnalyzeFrameResponse",
+        "description": "Structured result; raw frames are never stored."
+      },
+      "AssistantQuery": {
+        "properties": {
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "AssistantQuery",
+        "description": "A voice-text command from the user (Whisper transcript)."
+      },
+      "AssistantResponse": {
+        "properties": {
+          "reply": {
+            "type": "string",
+            "title": "Reply"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Action"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "detections": {
+            "items": {
+              "$ref": "#/components/schemas/SceneObject"
+            },
+            "type": "array",
+            "title": "Detections"
+          },
+          "route_change": {
+            "type": "boolean",
+            "title": "Route Change",
+            "default": false
+          },
+          "debug": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Debug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply"
+        ],
+        "title": "AssistantResponse",
+        "description": "Natural-language response, always grounded in structured state."
+      },
+      "BuildingAccessibilityOut": {
+        "properties": {
+          "building_id": {
+            "type": "integer",
+            "title": "Building Id"
+          },
+          "accessible_entrances": {
+            "items": {
+              "$ref": "#/components/schemas/Location"
+            },
+            "type": "array",
+            "title": "Accessible Entrances"
+          },
+          "elevators": {
+            "type": "integer",
+            "title": "Elevators",
+            "default": 0
+          },
+          "ramps": {
+            "type": "integer",
+            "title": "Ramps",
+            "default": 0
+          },
+          "wheelchair_accessible_floors": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Wheelchair Accessible Floors"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "building_id"
+        ],
+        "title": "BuildingAccessibilityOut"
+      },
+      "BuildingOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "has_floor_plan": {
+            "type": "boolean",
+            "title": "Has Floor Plan",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "BuildingOut"
+      },
+      "Detection": {
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence"
+          },
+          "estimated_distance_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Distance M"
+          },
+          "distance_confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Confidence"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/Direction",
+            "default": "front"
+          },
+          "bbox": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array",
+                "maxItems": 4,
+                "minItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "detector"
+          },
+          "attributes": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_type",
+          "confidence"
+        ],
+        "title": "Detection",
+        "description": "A single perceived object, fused from detection + depth + OCR."
+      },
+      "Direction": {
+        "type": "string",
+        "enum": [
+          "front",
+          "left",
+          "right",
+          "behind"
+        ],
+        "title": "Direction"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Location": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "accuracy_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy M"
+          },
+          "floor_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floor Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "title": "Location",
+        "description": "A geographic position (WGS84)."
+      },
+      "ProfileUpdate": {
+        "properties": {
+          "mobility": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "temporary_mobility",
+                  "wheelchair",
+                  "walking_aid",
+                  "cane"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mobility"
+          },
+          "vision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "temporary_vision",
+                  "low_vision",
+                  "blind"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vision"
+          },
+          "hearing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "hearing_aid",
+                  "deaf"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hearing"
+          },
+          "guidance_style": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "concise",
+                  "normal",
+                  "detailed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guidance Style"
+          },
+          "walking_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 4.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Walking Speed Mps"
+          },
+          "max_comfortable_distance_m": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000.0,
+                "minimum": 10.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Comfortable Distance M"
+          },
+          "cognitive_load_preference": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cognitive Load Preference"
+          }
+        },
+        "type": "object",
+        "title": "ProfileUpdate",
+        "description": "Partial update; omitted fields keep their current value."
+      },
+      "ReplanRequest": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "current": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/AccessibilityProfile",
+            "default": {
+              "mobility": "none",
+              "vision": "none",
+              "hearing": "none",
+              "guidance_style": "normal",
+              "walking_speed_mps": 1.2,
+              "max_comfortable_distance_m": 100,
+              "cognitive_load_preference": 1
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "current",
+          "destination"
+        ],
+        "title": "ReplanRequest",
+        "description": "Replan from the current position because the route is blocked."
+      },
+      "Route": {
+        "properties": {
+          "route_id": {
+            "type": "string",
+            "title": "Route Id"
+          },
+          "distance_m": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Distance M"
+          },
+          "duration_estimate_s": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Estimate S"
+          },
+          "accessibility_score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Accessibility Score",
+            "default": 1.0
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/RouteStep"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "cost_breakdown": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Cost Breakdown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_id",
+          "distance_m"
+        ],
+        "title": "Route",
+        "description": "An accessibility-aware route with a cost breakdown."
+      },
+      "RouteRequest": {
+        "properties": {
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/AccessibilityProfile",
+            "default": {
+              "mobility": "none",
+              "vision": "none",
+              "hearing": "none",
+              "guidance_style": "normal",
+              "walking_speed_mps": 1.2,
+              "max_comfortable_distance_m": 100,
+              "cognitive_load_preference": 1
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "origin",
+          "destination"
+        ],
+        "title": "RouteRequest",
+        "description": "Calculate a route from origin to destination for a user."
+      },
+      "RouteStep": {
+        "properties": {
+          "instruction": {
+            "type": "string",
+            "title": "Instruction"
+          },
+          "distance_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance M"
+          },
+          "action_type": {
+            "type": "string",
+            "title": "Action Type",
+            "default": "walk"
+          },
+          "required_accessibility": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Required Accessibility"
+          },
+          "node_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node Id"
+          },
+          "attributes": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instruction"
+        ],
+        "title": "RouteStep",
+        "description": "A single incremental instruction; one action at a time."
+      },
+      "SceneObject": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "distance_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance M"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/Direction",
+            "default": "front"
+          },
+          "accessible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accessible"
+          },
+          "temporary_blockage": {
+            "type": "boolean",
+            "title": "Temporary Blockage",
+            "default": false
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "default": 0.5
+          },
+          "currently_visible": {
+            "type": "boolean",
+            "title": "Currently Visible",
+            "default": true
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "attributes": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "title": "SceneObject",
+        "description": "A node in the scene graph derived from one or more detections."
+      },
+      "SceneUpdate": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "detections": {
+            "items": {
+              "$ref": "#/components/schemas/Detection"
+            },
+            "type": "array",
+            "title": "Detections"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id"
+        ],
+        "title": "SceneUpdate",
+        "description": "Incremental update of the live scene graph."
+      },
+      "SceneUpdateResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "scene_objects": {
+            "items": {
+              "$ref": "#/components/schemas/SceneObject"
+            },
+            "type": "array",
+            "title": "Scene Objects"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "observation_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observation Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "scene_objects",
+          "updated_at"
+        ],
+        "title": "SceneUpdateResponse",
+        "description": "The merged scene after applying the update."
+      },
+      "SessionCreate": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Device Id"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "SessionCreate",
+        "description": "Start a new assistance session."
+      },
+      "SessionOut": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "user_id",
+          "started_at"
+        ],
+        "title": "SessionOut"
+      },
+      "UserOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "device_id",
+          "created_at"
+        ],
+        "title": "UserOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerificationRequest": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "scene_objects": {
+            "items": {
+              "$ref": "#/components/schemas/SceneObject"
+            },
+            "type": "array",
+            "title": "Scene Objects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "action_id"
+        ],
+        "title": "VerificationRequest",
+        "description": "Ask the system to verify whether a planned action succeeded."
+      },
+      "VerificationResult": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "default": 0.0
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "replan_required": {
+            "type": "boolean",
+            "title": "Replan Required",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "action_id",
+          "verified"
+        ],
+        "title": "VerificationResult",
+        "description": "Closed-loop camera verification of a planned action."
+      }
+    }
+  }
+}

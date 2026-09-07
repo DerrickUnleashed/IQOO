@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/assistance/presentation/assistance_screen.dart';
+import '../../features/buildings/presentation/buildings_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/onboarding/domain/onboarding_providers.dart';
 import '../../features/onboarding/presentation/accessibility_preferences_screen.dart';
@@ -15,6 +16,7 @@ abstract class AppRoute {
   static const preferences = '/onboarding/preferences';
   static const assistance = '/assistance';
   static const profile = '/profile';
+  static const buildings = '/buildings';
 }
 
 /// Provides the [GoRouter] instance for the application.
@@ -57,6 +59,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoute.profile,
         name: AppRoute.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoute.buildings,
+        name: AppRoute.buildings,
+        builder: (context, state) => const BuildingsScreen(),
+        routes: [
+          GoRoute(
+            path: ':buildingId',
+            name: '${AppRoute.buildings}/:buildingId',
+            builder: (context, state) => BuildingDetailScreen(
+              building: state.extra as dynamic,
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoute.onboarding,

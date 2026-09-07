@@ -91,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
                     child: _HomeActionTile(
                       icon: Icons.map_outlined,
                       label: 'Find Accessible Route',
-                      onTap: () {},
+                      onTap: () => context.push(AppRoute.buildings),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),

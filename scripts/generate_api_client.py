@@ -129,7 +129,7 @@ class Req<R> {
   final int maxRetries;
 
   /// Strict-but-safe parse of the JSON response body.
-  final R Function(Map<String, dynamic> json) parse;
+  final R Function(dynamic json) parse;
 }
 
 /// Typed API client: credentials, retries with backoff, timeouts and
@@ -196,10 +196,7 @@ class ApiClient {
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final decoded = _decodeBody(response.body);
-        if (decoded is Map<String, dynamic>) {
-          return req.parse(decoded);
-        }
-        return req.parse(const {});
+        return req.parse(decoded);
       }
 
       final isRetryable = response.statusCode >= 500;
@@ -244,6 +241,7 @@ _ENDPOINT_NAMES = {
     ("get", "/api/v1/users/me"): "getMe",
     ("get", "/api/v1/users/me/profile"): "getMyProfile",
     ("put", "/api/v1/users/me/profile"): "updateMyProfile",
+    ("get", "/api/v1/buildings"): "listBuildings",
     ("get", "/api/v1/buildings/{building_id}"): "getBuilding",
     ("get", "/api/v1/buildings/{building_id}/accessibility"): "getBuildingAccessibility",
     ("post", "/api/v1/perception/analyze"): "analyzeFrame",
@@ -493,8 +491,18 @@ def _gen_endpoint(method: str, path: str, op: dict, schemas: dict) -> str:
         schema = resp.get("content", {}).get("application/json", {}).get("schema")
         if schema and schema.get("$ref"):
             resp_type = schema["$ref"].rsplit("/", 1)[-1]
-            parse = f"{resp_type}.fromJson"
+            parse = f"(j) => {resp_type}.fromJson(j as Map<String, dynamic>)"
             break
+        if schema and schema.get("type") == "array":
+            item = schema.get("items", {})
+            if item and item.get("$ref"):
+                elem = item["$ref"].rsplit("/", 1)[-1]
+                resp_type = f"List<{elem}>"
+                parse = (
+                    f"(j) => (j as List)"
+                    f".map((e) => {elem}.fromJson(e as Map<String, dynamic>)).toList()"
+                )
+                break
 
     # path rendering
     path_expr = path

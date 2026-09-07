@@ -717,7 +717,7 @@ class Req<R> {
   final int maxRetries;
 
   /// Strict-but-safe parse of the JSON response body.
-  final R Function(Map<String, dynamic> json) parse;
+  final R Function(dynamic json) parse;
 }
 
 /// Typed API client: credentials, retries with backoff, timeouts and
@@ -784,10 +784,7 @@ class ApiClient {
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final decoded = _decodeBody(response.body);
-        if (decoded is Map<String, dynamic>) {
-          return req.parse(decoded);
-        }
-        return req.parse(const {});
+        return req.parse(decoded);
       }
 
       final isRetryable = response.statusCode >= 500;
@@ -850,7 +847,7 @@ class ApiClient {
     path: '/auth/session',
     body: body.toJson(),
     
-    parse: SessionOut.fromJson,
+    parse: (j) => SessionOut.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -861,7 +858,7 @@ class ApiClient {
     path: '/users/me',
     
     query: {'device_id': deviceId},
-    parse: UserOut.fromJson,
+    parse: (j) => UserOut.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -872,7 +869,7 @@ class ApiClient {
     path: '/users/me/profile',
     
     query: {'device_id': deviceId},
-    parse: AccessibilityProfile.fromJson,
+    parse: (j) => AccessibilityProfile.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -883,7 +880,18 @@ class ApiClient {
     path: '/users/me/profile',
     body: body.toJson(),
     query: {'device_id': deviceId},
-    parse: AccessibilityProfile.fromJson,
+    parse: (j) => AccessibilityProfile.fromJson(j as Map<String, dynamic>),
+  ));
+
+
+
+  /// GET /api/v1/buildings
+  Future<List<BuildingOut>> listBuildings() => send(Req<List<BuildingOut>>(
+    method: 'GET',
+    path: '/buildings',
+    
+    
+    parse: (j) => (j as List).map((e) => BuildingOut.fromJson(e as Map<String, dynamic>)).toList(),
   ));
 
 
@@ -894,7 +902,7 @@ class ApiClient {
     path: '/buildings/${buildingId}',
     
     
-    parse: BuildingOut.fromJson,
+    parse: (j) => BuildingOut.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -905,7 +913,7 @@ class ApiClient {
     path: '/buildings/${buildingId}/accessibility',
     
     
-    parse: BuildingAccessibilityOut.fromJson,
+    parse: (j) => BuildingAccessibilityOut.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -916,7 +924,7 @@ class ApiClient {
     path: '/perception/analyze',
     body: body.toJson(),
     
-    parse: AnalyzeFrameResponse.fromJson,
+    parse: (j) => AnalyzeFrameResponse.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -927,7 +935,7 @@ class ApiClient {
     path: '/scene/update',
     body: body.toJson(),
     
-    parse: SceneUpdateResponse.fromJson,
+    parse: (j) => SceneUpdateResponse.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -938,7 +946,7 @@ class ApiClient {
     path: '/routes/calculate',
     body: body.toJson(),
     
-    parse: Route.fromJson,
+    parse: (j) => Route.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -949,7 +957,7 @@ class ApiClient {
     path: '/routes/replan',
     body: body.toJson(),
     
-    parse: Route.fromJson,
+    parse: (j) => Route.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -960,7 +968,7 @@ class ApiClient {
     path: '/verification/check',
     body: body.toJson(),
     
-    parse: VerificationResult.fromJson,
+    parse: (j) => VerificationResult.fromJson(j as Map<String, dynamic>),
   ));
 
 
@@ -971,7 +979,7 @@ class ApiClient {
     path: '/assistant/query',
     body: body.toJson(),
     
-    parse: AssistantResponse.fromJson,
+    parse: (j) => AssistantResponse.fromJson(j as Map<String, dynamic>),
   ));
 
 

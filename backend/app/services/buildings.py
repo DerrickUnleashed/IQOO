@@ -15,6 +15,13 @@ class BuildingService:
     def get_building(self, building_id: int) -> Optional[Building]:
         return self.db.get(Building, building_id)
 
+    def list_buildings(self) -> list[Building]:
+        """All known buildings, ordered by name."""
+        result = self.db.scalars(
+            select(Building).order_by(Building.name).limit(100)
+        ).all()
+        return list(result)
+
     def building_summary(self, building: Building) -> dict:
         """Aggregated accessibility summary for a building."""
         floors = self.db.scalars(
