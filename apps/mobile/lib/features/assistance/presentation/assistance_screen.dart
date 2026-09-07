@@ -6,6 +6,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../domain/camera_controller.dart';
 import '../domain/scene_overlay.dart';
 import '../domain/scene_pipeline.dart';
+import 'assistant_hud.dart';
 
 /// The most important screen in the app: full-screen camera with a
 /// minimal, calm overlay. Always answers "what do I do now?".
@@ -209,20 +210,22 @@ class _CameraViewState extends ConsumerState<_CameraView> {
             ],
           ),
         ),
-        SafeArea(
-          child: Column(
-            children: [
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: _VoiceHud(onTap: () {}),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-            ],
-          ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: _AssistantSheet(),
         ),
       ],
     );
+  }
+}
+
+/// Collapsible assistant conversation anchored over the camera feed.
+class _AssistantSheet extends StatelessWidget {
+  const _AssistantSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return const AssistantHud();
   }
 }
 
@@ -399,52 +402,6 @@ class _PrivacyIndicator extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Bottom voice HUD: hold-to-talk button and a hint row.
-class _VoiceHud extends StatelessWidget {
-  const _VoiceHud({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Center(
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                gradient: LinearGradient(
-                  colors: [Colors.white, Colors.white.withValues(alpha: 0.9)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.mic, size: 36, color: Color(0xFF1B5E2A)),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          'Hold to talk',
-          style: Theme.of(context).textTheme.labelMedium
-              ?.copyWith(color: Colors.white70),
-        ),
-      ],
     );
   }
 }

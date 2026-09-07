@@ -53,9 +53,12 @@ class ConversationReplied extends AssistantConversation {
 }
 
 class ConversationUnavailable extends AssistantConversation {
-  const ConversationUnavailable({required this.reason});
+  const ConversationUnavailable({required this.reason, this.messages = const []});
 
   final String reason;
+
+  @override
+  final List<AssistantMessage> messages;
 }
 
 /// Short-lived voice error that the UI may surface.
@@ -86,8 +89,9 @@ class AssistantController extends Notifier<AssistantConversation> {
   Future<bool> startListening() async {
     final speech = ref.read(speechRecognizerProvider);
     if (!speech.isAvailable) {
-      state = const ConversationUnavailable(
+      state = ConversationUnavailable(
         reason: 'Voice input is not available here — type your question instead.',
+        messages: _messages,
       );
       return false;
     }
@@ -150,8 +154,9 @@ class AssistantController extends Notifier<AssistantConversation> {
       if (tts.isAvailable) await tts.speak(response.reply);
     } on Exception {
       if (!ref.mounted) return;
-      state = const ConversationUnavailable(
+      state = ConversationUnavailable(
         reason: 'I could not reach the copilot. Check your connection and try again.',
+        messages: _messages,
       );
     }
   }
