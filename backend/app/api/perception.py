@@ -26,9 +26,17 @@ async def analyze_frame(
     start = time.perf_counter()
     frame = req.encoded_frame or b""
     detections: list[Detection] = await provider.analyze_frame(frame)
+    # The client needs to know how the scene was produced: scripted playback
+    # and partial-coverage weights must never read as a confident observation.
+    summary = {
+        **provider.status(),
+        "detection_count": len(detections),
+        "frame_received": bool(frame),
+    }
     return AnalyzeFrameResponse(
         frame_id=req.frame_id,
         detections=detections,
+        scene_summary=summary,
         processing_ms=int((time.perf_counter() - start) * 1000),
     )
 

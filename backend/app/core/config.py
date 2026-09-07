@@ -55,6 +55,30 @@ class Settings(BaseSettings):
     # Model weights directory (mounted from repo in docker)
     MODELS_DIR: str = "models"
 
+    # Perception: auto | real | scripted | off.
+    # ``auto`` uses real inference when weights are present and falls back to
+    # scripted scenario playback otherwise. ``real`` never falls back.
+    PERCEPTION_MODE: str = "auto"
+    YOLO_WEIGHTS: str = "yolo/yolo11n.pt"  # relative to MODELS_DIR
+    YOLO_CONFIDENCE_THRESHOLD: float = 0.35
+    DEMO_SCENARIO: str = "stairs_ramp"
+
+    @property
+    def models_path(self) -> Path:
+        """Absolute path to the model weights directory."""
+        configured = Path(self.MODELS_DIR)
+        if configured.is_absolute():
+            return configured
+        return _REPO_ROOT / configured
+
+    @property
+    def yolo_weights_path(self) -> Path:
+        """Absolute path to the configured YOLO checkpoint."""
+        configured = Path(self.YOLO_WEIGHTS)
+        if configured.is_absolute():
+            return configured
+        return self.models_path / configured
+
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
     def _split_origins(cls, value: Any) -> Any:

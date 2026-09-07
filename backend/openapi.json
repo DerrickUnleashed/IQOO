@@ -36,7 +36,7 @@
           "health"
         ],
         "summary": "Readiness",
-        "description": "Readiness check including capability info.\n\n``ai_enabled`` reflects whether cloud AI capabilities (Gemini) are\nconfigured; the service degrades gracefully when it is false.",
+        "description": "Readiness check including capability info.\n\n``ai_enabled`` reflects whether cloud AI capabilities (Gemini) are\nconfigured; the service degrades gracefully when it is false.\n``perception`` reports which engine is actually running, so a client can\ntell real inference from scripted playback.",
         "operationId": "readiness_api_v1_readiness_get",
         "responses": {
           "200": {
@@ -731,7 +731,7 @@
           "title"
         ],
         "title": "Action",
-        "description": "The recommended next action \u2014 the core product output."
+        "description": "The recommended next action — the core product output."
       },
       "AnalyzeFrameRequest": {
         "properties": {

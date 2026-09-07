@@ -1,5 +1,10 @@
-# AccessCopilot AI dependencies (LangGraph agent orchestration)
+# AccessCopilot AI dependencies (agent orchestration + perception engines)
+# Optional: the backend runs without these in scripted perception mode.
 # Install with: pip install -r requirements-ai.txt
 langgraph>=0.4,<1.0
 langchain-google-genai>=2.0,<3.0
 langsmith>=0.3,<1.0
+
+# Object detection (YOLOv11). Pulls in torch, which is a large download.
+ultralytics>=8.3,<9.0
+pillow>=11.0,<12.0

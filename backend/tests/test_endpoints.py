@@ -4,16 +4,18 @@ These hit the live Postgres/PostGIS instance (docker compose up -d db).
 A db fixture isolates user records per test.
 """
 
+import base64
 import uuid
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app.api.dependencies import get_perception_provider
 from app.db.base import SessionLocal
-from app.models import Building
+from app.main import app
+from app.models import Building, User
 from app.models import Session as SessionModel
-from app.models import User
+from app.perception.provider import MODE_SCRIPTED, build_perception_provider
 
 client = TestClient(app)
 
@@ -122,3 +124,37 @@ def test_analyze_frame_degrades_gracefully() -> None:
     body = response.json()
     assert body["frame_id"] == "f1"
     assert body["detections"] == []
+    # A frame that was never sent must not read as "nothing is there".
+    assert body["scene_summary"]["frame_received"] is False
+
+
+def test_analyze_frame_reports_how_the_scene_was_produced() -> None:
+    """Clients must be able to tell scripted playback from real inference."""
+    provider = build_perception_provider(mode=MODE_SCRIPTED, scenario="stairs_ramp")
+    app.dependency_overrides[get_perception_provider] = lambda: provider
+    try:
+        response = client.post(
+            "/api/v1/perception/analyze",
+            json={
+                "frame_id": "f2",
+                "session_id": "s1",
+                "encoded_frame": base64.b64encode(b"frame-bytes").decode(),
+            },
+        )
+    finally:
+        app.dependency_overrides.pop(get_perception_provider, None)
+
+    assert response.status_code == 200
+    body = response.json()
+    summary = body["scene_summary"]
+    assert summary["mode"] == MODE_SCRIPTED
+    assert summary["frame_received"] is True
+    assert summary["detection_count"] == len(body["detections"])
+    assert body["detections"], "scripted playback should produce a scene"
+    assert all(d["source"] == "scripted" for d in body["detections"])
+
+
+def test_readiness_reports_the_active_perception_engine() -> None:
+    body = client.get("/api/v1/readiness").json()
+    assert body["perception"]["mode"] in {"real", "scripted", "off"}
+    assert "coverage" in body["perception"]
