@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../domain/camera_controller.dart';
+import '../domain/scene_overlay.dart';
+import '../domain/scene_pipeline.dart';
 
 /// The most important screen in the app: full-screen camera with a
 /// minimal, calm overlay. Always answers "what do I do now?".
@@ -127,20 +129,46 @@ class _FullScreenMessage extends StatelessWidget {
   }
 }
 
-class _CameraView extends ConsumerWidget {
+class _CameraView extends ConsumerStatefulWidget {
   const _CameraView({required this.controller, required this.isTorchOn});
 
   final CameraController controller;
   final bool isTorchOn;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_CameraView> createState() => _CameraViewState();
+}
+
+class _CameraViewState extends ConsumerState<_CameraView> {
+  @override
+  void initState() {
+    super.initState();
+    // Start the perception pipeline against the live camera feed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(scenePipelineStateProvider.notifier)
+          .attachCamera(widget.controller);
+    });
+  }
+
+  @override
+  void dispose() {
+    ref.read(scenePipelineStateProvider.notifier).detach();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = widget.controller;
+    final isTorchOn = widget.isTorchOn;
     final notifier = ref.read(cameraStateProvider.notifier);
+    final annotations = ref.watch(sceneAnnotationsProvider);
 
     return Stack(
       fit: StackFit.expand,
       children: [
         CameraPreview(controller),
+        _SceneOverlay(annotations: annotations),
         SafeArea(
           child: Align(
             alignment: Alignment.topCenter,
@@ -194,6 +222,82 @@ class _CameraView extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Renders the profile-aware scene annotations over the camera feed.
+class _SceneOverlay extends StatelessWidget {
+  const _SceneOverlay({required this.annotations});
+
+  final List<SceneAnnotation> annotations;
+
+  @override
+  Widget build(BuildContext context) {
+    if (annotations.isEmpty) return const SizedBox.shrink();
+
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.topRight,
+        child: Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.xxl * 2, right: AppSpacing.md),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (final a in annotations)
+                _AnnotationChip(
+                  label: a.label,
+                  color: a.color,
+                  urgent: a.urgent,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnnotationChip extends StatelessWidget {
+  const _AnnotationChip({
+    required this.label,
+    required this.color,
+    required this.urgent,
+  });
+
+  final String label;
+  final Color color;
+  final bool urgent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color, width: urgent ? 2 : 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            urgent ? Icons.warning_amber_rounded : Icons.circle,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ],
+      ),
     );
   }
 }

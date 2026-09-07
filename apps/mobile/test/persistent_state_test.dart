@@ -46,7 +46,7 @@ void main() {
     }),
   );
 
-  ProviderContainer _container() {
+  ProviderContainer makeContainer() {
     return ProviderContainer(
       overrides: [apiClientProvider.overrideWithValue(fakeClient)],
     );
@@ -58,7 +58,7 @@ void main() {
 
   group('ProfileNotifier (persistent, profile-aware state)', () {
     test('persists an update to local storage', () async {
-      final container = _container();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final notifier = container.read(
@@ -89,7 +89,7 @@ void main() {
             '"max_comfortable_distance_m":80,"cognitive_load_preference":2}',
       });
 
-      final container = _container();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       // First read triggers build() which schedules hydration.
@@ -104,7 +104,7 @@ void main() {
     });
 
     test('profileGuidance follows the current profile', () async {
-      final container = _container();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final notifier = container.read(
