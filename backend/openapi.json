@@ -36,7 +36,7 @@
           "health"
         ],
         "summary": "Readiness",
-        "description": "Readiness check including capability info.\n\n``ai_enabled`` reflects whether cloud AI capabilities (Gemini) are\nconfigured; the service degrades gracefully when it is false.\n``perception`` reports which engine is actually running, so a client can\ntell real inference from scripted playback.",
+        "description": "Readiness check including capability info.\n\n``ai_enabled`` reflects whether cloud AI capabilities (Groq) are\nconfigured; the service degrades gracefully when it is false.\n``perception`` reports which engine is actually running, so a client can\ntell real inference from scripted playback.",
         "operationId": "readiness_api_v1_readiness_get",
         "responses": {
           "200": {

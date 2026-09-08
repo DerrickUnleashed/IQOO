@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
+from .profile import AccessibilityProfile
 from .scene import SceneObject
 
 
@@ -41,6 +42,7 @@ class AssistantQuery(BaseModel):
     session_id: Optional[str] = None
     text: str
     intent: Optional[str] = None
+    profile: Optional[AccessibilityProfile] = None
 
 
 class AssistantResponse(BaseModel):

@@ -53,9 +53,9 @@ def test_allowed_origins_passes_through_a_real_list() -> None:
     assert _settings(ALLOWED_ORIGINS=origins).ALLOWED_ORIGINS == origins
 
 
-def test_has_ai_capabilities_tracks_the_gemini_key() -> None:
-    assert _settings(GEMINI_API_KEY="").has_ai_capabilities is False
-    assert _settings(GEMINI_API_KEY="k").has_ai_capabilities is True
+def test_has_ai_capabilities_tracks_the_groq_key() -> None:
+    assert _settings(GROQ_API_KEY="").has_ai_capabilities is False
+    assert _settings(GROQ_API_KEY="k").has_ai_capabilities is True
 
 
 def test_module_level_settings_expose_a_usable_origin_list() -> None:

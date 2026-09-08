@@ -24,7 +24,7 @@ AccessCopilot is a camera-to-action accessibility copilot that:
 
 ## Key Innovation
 
-The system separates **perception** (YOLO, depth, OCR) from **reasoning** (Gemini LLM) from **safety rules** (deterministic constraints). The LLM generates natural language but cannot override safety-critical decisions.
+The system separates **perception** (YOLO, depth, OCR) from **reasoning** (Groq LLM) from **safety rules** (deterministic constraints). The LLM generates natural language but cannot override safety-critical decisions.
 
 ## Architecture
 
@@ -56,7 +56,7 @@ The system separates **perception** (YOLO, depth, OCR) from **reasoning** (Gemin
                  LangGraph
               ┌──────┴──────┐
               ▼             ▼
-           Gemini       Route Planner
+           Groq         Route Planner
               │             │
               └──────┬──────┘
                      ▼
@@ -82,7 +82,7 @@ The system separates **perception** (YOLO, depth, OCR) from **reasoning** (Gemin
 | Mobile | Flutter, Dart, Material 3, Riverpod, GoRouter |
 | Backend | Python, FastAPI, WebSockets, PostgreSQL, PostGIS |
 | AI/CV | YOLOv11, Depth Anything V2, PaddleOCR, Whisper |
-| LLM | Gemini (reasoning) + LangGraph (agent orchestration) |
+| LLM | Groq (reasoning) + LangGraph (agent orchestration) |
 | Routing | OSRM (outdoor), Custom graph (indoor) |
 | Infra | Docker, PostgreSQL + PostGIS |
 

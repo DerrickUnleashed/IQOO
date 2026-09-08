@@ -13,7 +13,7 @@ from app.schemas.perception import (
 from app.schemas.scene import SceneUpdate, SceneUpdateResponse
 from app.services.scene import SceneGraphService
 
-from .dependencies import get_perception_provider
+from .dependencies import get_perception_provider, get_scene_service
 
 router = APIRouter(tags=["perception"])
 
@@ -42,9 +42,11 @@ async def analyze_frame(
 
 
 @router.post("/scene/update", response_model=SceneUpdateResponse)
-async def update_scene(req: SceneUpdate) -> SceneUpdateResponse:
+async def update_scene(
+    req: SceneUpdate,
+    service: SceneGraphService = Depends(get_scene_service),
+) -> SceneUpdateResponse:
     """Apply detections to the stateful scene graph for a session."""
-    service = SceneGraphService()
     scene = service.apply(session_id=req.session_id, detections=req.detections)
     return SceneUpdateResponse(
         session_id=req.session_id,

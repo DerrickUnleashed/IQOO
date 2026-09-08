@@ -1,8 +1,9 @@
 # AccessCopilot AI dependencies (agent orchestration + perception engines)
-# Optional: the backend runs without these in scripted perception mode.
+# Optional: the backend runs without these — perception falls back to
+# scripted scenarios and reasoning falls back to deterministic phrasing.
 # Install with: pip install -r requirements-ai.txt
 langgraph>=0.4,<1.0
-langchain-google-genai>=2.0,<3.0
+groq>=0.11,<1.0
 langsmith>=0.3,<1.0
 
 # Object detection (YOLOv11). Pulls in torch, which is a large download.
