@@ -61,7 +61,7 @@ class AppTheme {
           ),
           textStyle: base.textTheme.labelLarge,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
       ),
@@ -73,10 +73,10 @@ class AppTheme {
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.lg,
           ),
-          side: BorderSide(color: colorScheme.outline),
+          side: BorderSide(color: colorScheme.outline, width: 1.5),
           textStyle: base.textTheme.labelLarge,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
       ),
@@ -92,18 +92,23 @@ class AppTheme {
         ),
       ),
 
+      // Floating cards with a soft brand-tinted shadow instead of a flat
+      // border read as considerably more premium while staying subtle.
       cardTheme: CardThemeData(
         margin: EdgeInsets.zero,
-        elevation: 0,
+        elevation: isDark ? 0 : 6,
+        shadowColor: AppColors.primary.withValues(alpha: isDark ? 0 : 0.10),
         color: colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: colorScheme.outlineVariant),
+          borderRadius: BorderRadius.circular(24),
+          side: isDark
+              ? BorderSide(color: colorScheme.outlineVariant)
+              : BorderSide.none,
         ),
       ),
 
       chipTheme: base.chipTheme.copyWith(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
       ),
 
       dividerTheme: DividerThemeData(

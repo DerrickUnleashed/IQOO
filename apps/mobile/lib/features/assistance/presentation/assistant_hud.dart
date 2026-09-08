@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../domain/assistant_controller.dart';
 
@@ -51,10 +54,19 @@ class _AssistantHudState extends ConsumerState<AssistantHud> {
       _ => false,
     };
 
-    return Container(
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.72),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        color: Colors.black.withValues(alpha: 0.62),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        border: Border(
+          top: BorderSide(
+            color: AppColors.accentDark.withValues(alpha: 0.35),
+          ),
+        ),
       ),
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -144,6 +156,8 @@ class _AssistantHudState extends ConsumerState<AssistantHud> {
           ],
         ),
       ),
+        ),
+      ),
     );
   }
 }
@@ -158,11 +172,27 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.assistant_rounded, color: Colors.white, size: 20),
+        Container(
+          width: 28,
+          height: 28,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: AppColors.glowGradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: const Icon(Icons.assistant_rounded, color: Colors.white, size: 16),
+        ),
         const SizedBox(width: AppSpacing.sm),
         Text(
           status,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const Spacer(),
         IconButton(
@@ -201,10 +231,20 @@ class _MessageList extends StatelessWidget {
               ),
               constraints: const BoxConstraints(maxWidth: 280),
               decoration: BoxDecoration(
-                color: isUser
-                    ? Colors.green.withValues(alpha: 0.25)
-                    : Colors.blueGrey.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(14),
+                gradient: isUser
+                    ? LinearGradient(
+                        colors: AppColors.heroGradient
+                            .map((c) => c.withValues(alpha: 0.55))
+                            .toList(),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
+                color: isUser ? null : Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
+                border: isUser
+                    ? null
+                    : Border.all(color: Colors.white.withValues(alpha: 0.14)),
               ),
               child: Text(
                 message.text,
@@ -245,10 +285,23 @@ class _VoiceButton extends StatelessWidget {
           height: 48,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: listening
-                ? Colors.redAccent
-                : Colors.white.withValues(alpha: 0.2),
-            border: Border.all(color: Colors.white, width: 2),
+            gradient: listening
+                ? const LinearGradient(colors: AppColors.glowGradient)
+                : null,
+            color: listening ? null : Colors.white.withValues(alpha: 0.14),
+            border: Border.all(
+              color: listening ? Colors.white : AppColors.accentDark,
+              width: 2,
+            ),
+            boxShadow: listening
+                ? [
+                    BoxShadow(
+                      color: AppColors.accentDark.withValues(alpha: 0.5),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : null,
           ),
           child: Icon(
             listening ? Icons.graphic_eq : Icons.mic,

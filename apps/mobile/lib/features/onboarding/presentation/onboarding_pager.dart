@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/index.dart';
 
 /// A single onboarding explanation page.
 class OnboardingPageView {
@@ -69,7 +71,10 @@ class _OnboardingPagerState extends State<OnboardingPager> {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const Positioned.fill(child: AmbientBackground()),
+          SafeArea(
         child: Column(
           children: [
             Align(
@@ -101,13 +106,24 @@ class _OnboardingPagerState extends State<OnboardingPager> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: scheme.primaryContainer,
-                            shape: BoxShape.circle,
+                            borderRadius: BorderRadius.circular(32),
+                            gradient: const LinearGradient(
+                              colors: AppColors.heroGradient,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.32),
+                                blurRadius: 32,
+                                offset: const Offset(0, 12),
+                              ),
+                            ],
                           ),
                           child: Icon(
                             page.icon,
                             size: 56,
-                            color: scheme.onPrimaryContainer,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xxl),
@@ -150,20 +166,19 @@ class _OnboardingPagerState extends State<OnboardingPager> {
             ),
             Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _next,
-                  child: Text(
-                    _index == onboardingPages.length - 1
-                        ? 'Get started'
-                        : 'Continue',
-                  ),
+              child: PrimaryButton(
+                onPressed: _next,
+                child: Text(
+                  _index == onboardingPages.length - 1
+                      ? 'Get started'
+                      : 'Continue',
                 ),
               ),
             ),
           ],
         ),
+          ),
+        ],
       ),
     );
   }

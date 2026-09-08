@@ -23,10 +23,11 @@ class InstructionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = switch (tone) {
-      InstructionTone.info => const Color(0xFF1565C0),
-      InstructionTone.success => const Color(0xFF2E7D32),
-      InstructionTone.warning => const Color(0xFFC62828),
+      InstructionTone.info => const Color(0xFF0EA5E9),
+      InstructionTone.success => const Color(0xFF16A34A),
+      InstructionTone.warning => const Color(0xFFDC2626),
       InstructionTone.neutral => Theme.of(context).colorScheme.onSurface,
     };
 
@@ -34,16 +35,25 @@ class InstructionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.4 : 0.18)),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.16),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+              ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,

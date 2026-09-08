@@ -1,6 +1,7 @@
 /// Widgets from the AccessCopilot design system.
 library;
 
+export 'ambient_background.dart' show AmbientBackground;
 export 'app_buttons.dart'
     show
         AccessibilityBadge,
