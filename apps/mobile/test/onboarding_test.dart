@@ -27,11 +27,11 @@ void main() {
 
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      expect(find.text('See your environment.'), findsOneWidget);
+      expect(find.text('See what matters\nmost.'), findsOneWidget);
 
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      expect(find.text('Personalized to you.'), findsOneWidget);
+      expect(find.text('Support that\nfeels human.'), findsOneWidget);
       expect(find.text('Get started'), findsOneWidget);
     });
 
@@ -63,7 +63,7 @@ void main() {
       );
       await tester.pump();
 
-      await tester.tap(find.text('Skip'));
+      await tester.tap(find.text('Skip for now'));
       await tester.pumpAndSettle();
 
       expect(finished, isTrue);

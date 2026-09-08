@@ -147,37 +147,42 @@ class _CameraView extends ConsumerStatefulWidget {
 
 class _CameraViewState extends ConsumerState<_CameraView>
     with WidgetsBindingObserver {
+  // Captured once, up front: `ref` is unsafe to read inside dispose() —
+  // by the time it runs the widget may already be unmounted, which
+  // Riverpod treats as a fatal error and previously brought the whole
+  // app down when leaving this screen. Riverpod's own guidance for this
+  // is exactly this: save the provider state in a field instead.
+  late final ScenePipelineController _pipeline;
+
   @override
   void initState() {
     super.initState();
+    _pipeline = ref.read(scenePipelineStateProvider.notifier);
     WidgetsBinding.instance.addObserver(this);
     // Start the perception pipeline against the live camera feed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(scenePipelineStateProvider.notifier)
-          .attachCamera(widget.controller);
+      _pipeline.attachCamera(widget.controller);
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ref.read(scenePipelineStateProvider.notifier).detach();
+    _pipeline.detach();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final pipeline = ref.read(scenePipelineStateProvider.notifier);
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.inactive) {
       // Stop analyzing frames while the feed is not visible.
-      pipeline.detach();
+      _pipeline.detach();
     } else if (state == AppLifecycleState.resumed) {
       // Re-wire the perception pipeline on return to the foreground.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) pipeline.attachCamera(widget.controller);
+        if (mounted) _pipeline.attachCamera(widget.controller);
       });
     }
   }

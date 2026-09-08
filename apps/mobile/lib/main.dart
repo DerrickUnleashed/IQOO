@@ -44,6 +44,7 @@ class _AccessCopilotAppState extends ConsumerState<AccessCopilotApp>
       routerConfig: router,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.dark,
     );
   }
 }

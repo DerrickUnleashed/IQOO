@@ -54,16 +54,16 @@ class _AmbientBackgroundState extends State<AmbientBackground>
           return Stack(
             children: [
               _Blob(
-                diameter: 260 + (t * 60),
+                diameter: 310 + (t * 60),
                 alignment: const Alignment(1.3, -1.1),
                 colors: AppColors.heroGradient,
-                opacity: (isDark ? 0.30 : 0.16) * t,
+                opacity: (isDark ? 0.34 : 0.16) * t,
               ),
               _Blob(
                 diameter: 280 + (t * 80),
                 alignment: const Alignment(-1.3, 1.15),
-                colors: AppColors.glowGradient,
-                opacity: (isDark ? 0.24 : 0.12) * t,
+                colors: const [AppColors.forest, AppColors.accent],
+                opacity: (isDark ? 0.32 : 0.12) * t,
               ),
             ],
           );

@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local tool checkouts (e.g. a full Flutter SDK clone left behind by an
+# editor/agent's own toolchain) — never project content, can be multi-GB.
+.tooling/

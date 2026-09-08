@@ -16,7 +16,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('How can I help you navigate?'), findsOneWidget);
+      expect(
+        find.text('A calmer, clearer way to explore the world around you.'),
+        findsOneWidget,
+      );
       expect(find.text('Start Assistance'), findsOneWidget);
       expect(find.text('Ask Copilot'), findsOneWidget);
       expect(find.text('Find Accessible Route'), findsOneWidget);
@@ -32,9 +35,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // The primary CTA is a custom gradient InkWell card, not a stock
+      // FilledButton — matches the current visual design.
       final buttonFinder = find.ancestor(
         of: find.text('Start Assistance'),
-        matching: find.byType(FilledButton),
+        matching: find.byType(InkWell),
       );
       expect(buttonFinder, findsOneWidget);
 
