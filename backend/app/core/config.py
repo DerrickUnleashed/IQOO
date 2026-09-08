@@ -48,7 +48,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "dev-secret-change-in-production"
 
     # AI (filled at runtime; empty means degraded mode)
-    GEMINI_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
     LANGSMITH_API_KEY: str = ""
     LANGSMITH_PROJECT: str = "accesscopilot"
 
@@ -98,7 +99,7 @@ class Settings(BaseSettings):
 
     @property
     def has_ai_capabilities(self) -> bool:
-        return bool(self.GEMINI_API_KEY)
+        return bool(self.GROQ_API_KEY)
 
 
 settings = Settings()

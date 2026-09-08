@@ -21,7 +21,7 @@ async def health() -> dict:
 async def readiness() -> dict:
     """Readiness check including capability info.
 
-    ``ai_enabled`` reflects whether cloud AI capabilities (Gemini) are
+    ``ai_enabled`` reflects whether cloud AI capabilities (Groq) are
     configured; the service degrades gracefully when it is false.
     ``perception`` reports which engine is actually running, so a client can
     tell real inference from scripted playback.
